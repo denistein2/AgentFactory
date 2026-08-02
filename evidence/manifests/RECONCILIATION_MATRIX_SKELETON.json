@@ -1,0 +1,33 @@
+{
+  "matrix_spec": "CROSSAUDIT-RECONCILIATION",
+  "matrix_version": "v001",
+  "mission_id": "EXCHANGE-CROSSAUDIT-XXX",
+  "assembled_by": "CODEX",
+  "assembled_at": "",
+  "codex_boundary": "Somente fatos verificaveis. Julgamento => DECISAO HUMANA. Nunca meio-termo automatico.",
+  "inputs": {
+    "source_locked_sha256": "",
+    "gpt_construction": [],
+    "claude_construction": [],
+    "gpt_audit": "",
+    "claude_audit": "",
+    "freeze_manifests": []
+  },
+  "rows": [
+    {
+      "tema": "",
+      "gpt": "",
+      "claude": "",
+      "auditor_gpt": "",
+      "auditor_claude": "",
+      "estado": "CONSENSO | DECISAO_HUMANA | LACUNA | ESCOLHA_HUMANA",
+      "fact_type": "EXISTS | HASH_MATCH | TEXT_DIVERGENCE",
+      "requires_human": false
+    }
+  ],
+  "human_decision_blocks": {
+    "consensos": [],
+    "correcoes_objetivas": [],
+    "decisoes_humanas_abertas": []
+  }
+}

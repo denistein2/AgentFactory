@@ -1,0 +1,43 @@
+{
+  "_comment": "Mapa de PII DERIVADO DO SCHEMA REAL (#7767, 30/07/2026, [BANCO]). Só tabelas — views (v_orders_calendar) NÃO entram: derivam de orders, não têm COPY no dump. Nomes de CATÁLOGO (products/product_variants/stock_types/merc_*/payment_methods_config/accounting_plan/product_types/technical_sheets) NÃO são PII e NÃO entram: mascará-los quebraria os testes #7730 e não protege pessoa nenhuma.",
+  "_fk_auth_note": "PROVADO [BANCO #7767 bloco2 VAZIO]: nenhuma FK de public para auth. As 40 colunas created_by/updated_by/operator_id/audited_by são uuid SOLTOS, sem FK. Esvaziar auth.users no snapshot é SEGURO — o restore NÃO quebra. Colunas de autoria NÃO precisam de máscara (uuid sem valor pessoal derivável).",
+  "column_map": {
+    "public.contacts": {
+      "name": "name",
+      "email": "email",
+      "phone": "phone",
+      "document": "doc",
+      "delivery_address": "address",
+      "birth_date": "date"
+    },
+    "public.orders": {
+      "customer_name": "name",
+      "customer_phone": "phone",
+      "delivery_address": "address"
+    },
+    "public.cashier_sessions": {
+      "operator_email": "email"
+    },
+    "public.pix_config": {
+      "merchant_name": "name",
+      "store_cep": "address"
+    },
+    "public.tenants": {
+      "name": "name"
+    }
+  },
+  "drop_tables": [
+    "auth.users",
+    "auth.identities",
+    "auth.sessions",
+    "auth.refresh_tokens",
+    "storage.objects"
+  ],
+  "_not_pii_catalog": [
+    "products.name","product_variants.name","stock_types.name","product_types.name",
+    "technical_sheets.name","payment_methods_config.name","accounting_plan.name",
+    "merc_grupos.nome","merc_subgrupos.nome","merc_subtipos.nome","merc_tipos.nome",
+    "order_items.product_name"
+  ],
+  "_jsonb_freetext_todo": "🚩 Auditor apontou: colunas jsonb/text livres (metadata/details/notes/payload) podem conter PII sem 'email'/'phone' no nome. O #7767 não buscou jsonb por conteúdo. ANTES do 1º dump real: rodar inventário de colunas jsonb/text e revisar cada uma. Fail-closed do sanitizador (v0.2) cobre coluna nova não-classificada."
+}

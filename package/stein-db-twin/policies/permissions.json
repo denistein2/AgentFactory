@@ -1,0 +1,28 @@
+{
+  "_doc": "Quem pode o quê, por camada. Agente = liberdade total no clone, zero nos ambientes reais.",
+  "database_local_clone": {
+    "read": true,
+    "write": true,
+    "ddl": true,
+    "destructive_tests": true,
+    "rollback_tests": true,
+    "who": "agente (Codex/Claude) sem gate"
+  },
+  "database_homolog": {
+    "agent_read": false,
+    "agent_write": false,
+    "agent_ddl": false,
+    "human_execute": true,
+    "who": "SÓ Denis, 1 aplicação após STOP GATE"
+  },
+  "database_production": {
+    "agent_access": false,
+    "human_gate": "mandatory"
+  },
+  "repository": {
+    "agent_write": ["docs/**", "scripts/**"],
+    "agent_commit": false,
+    "agent_push": false,
+    "human_approves": ["commit", "push", "pull_request_merge"]
+  }
+}

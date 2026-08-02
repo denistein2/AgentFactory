@@ -1,0 +1,72 @@
+name: session-pr
+
+# PR autônomo (draft) ao fim de cada sessão. Merge = gate humano (M18).
+# Correções do parecer (P0-ORG-03 / D3):
+#  - fetch completo (fetch-depth 0) e fetch explícito de main;
+#  - permissão mínima (pull-requests: write, contents: read);
+#  - guard por nome + secret scan por conteúdo; sem auto-merge.
+
+on:
+  push:
+    branches:
+      - 'session/**'
+      - 'bootstrap/**'
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (histórico completo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Garantir base main para diff
+        run: |
+          git fetch origin main || true
+          if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            echo "BASE=origin/main" >> "$GITHUB_ENV"
+          else
+            echo "BASE=$(git rev-list --max-parents=0 HEAD | tail -1)" >> "$GITHUB_ENV"
+            echo "::warning::origin/main ausente; usando root commit como base."
+          fi
+
+      - name: Guard — dumps/segredos/dados reais por NOME (STOP-03)
+        run: |
+          set -e
+          BLOCK='Testbank\.sql|\.dump$|_REAL\.|credentials.*\.json|\.env($|\.)|\.pem$|\.key$|dump_completo|\.sqlite3?$|\.db$'
+          HITS=$(git diff --name-only "$BASE"...HEAD | grep -E "$BLOCK" || true)
+          if [ -n "$HITS" ]; then echo "::error::Proibido:"; echo "$HITS"; exit 1; fi
+          echo "OK nomes."
+
+      - name: Secret scan por CONTEÚDO
+        run: |
+          set -e
+          if git grep -nEI '(AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]+)' -- . ':!*.md' 2>/dev/null; then
+            echo "::error::Possível segredo."; exit 1; fi
+          echo "OK conteudo."
+
+      - name: Exigir registro de sessão
+        run: |
+          if ! git diff --name-only "$BASE"...HEAD | grep -q '^docs/sessions/'; then
+            echo "::error::Falta SESSION_*.md (SESSION_CLOSE_PROTOCOL.md)."; exit 1; fi
+          echo "OK sessao."
+
+      - name: Abrir/atualizar PR draft com corpo real da sessão
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BR="${GITHUB_REF_NAME}"; SLUG="${BR#*/}"
+          TITLE="session(${SLUG}): fechamento $(date +%F)"
+          SESS=$(git diff --name-only "$BASE"...HEAD | grep '^docs/sessions/.*SESSION_.*\.md' | tail -1 || true)
+          if [ -n "$SESS" ] && [ -f "$SESS" ]; then BODY=$(cat "$SESS"); else BODY=$(cat .github/PULL_REQUEST_TEMPLATE.md); fi
+          if gh pr view "$BR" >/dev/null 2>&1; then
+            gh pr edit "$BR" --title "$TITLE" --body "$BODY"
+          else
+            gh pr create --draft --base main --head "$BR" --title "$TITLE" --body "$BODY"
+          fi
+          echo "PR draft pronto. Merge = gate humano."
