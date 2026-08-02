@@ -4,7 +4,8 @@ name: session-pr
 # Correções do parecer (P0-ORG-03 / D3):
 #  - fetch completo (fetch-depth 0) e fetch explícito de main;
 #  - permissão mínima (pull-requests: write, contents: read);
-#  - guard por nome + secret scan por conteúdo; sem auto-merge.
+#  - guard por nome + secret scan por conteúdo; sem auto-merge;
+#  - detecção idempotente de PR + fallback manual quando criação não é permitida.
 
 on:
   push:
@@ -57,16 +58,70 @@ jobs:
           echo "OK sessao."
 
       - name: Abrir/atualizar PR draft com corpo real da sessão
+        id: draft-pr
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
+          set -euo pipefail
+
           BR="${GITHUB_REF_NAME}"; SLUG="${BR#*/}"
           TITLE="session(${SLUG}): fechamento $(date +%F)"
+          COMPARE_URL="${GITHUB_SERVER_URL}/${REPO}/compare/main...${BR}?expand=1"
+
           SESS=$(git diff --name-only "$BASE"...HEAD | grep '^docs/sessions/.*SESSION_.*\.md' | tail -1 || true)
-          if [ -n "$SESS" ] && [ -f "$SESS" ]; then BODY=$(cat "$SESS"); else BODY=$(cat .github/PULL_REQUEST_TEMPLATE.md); fi
-          if gh pr view "$BR" >/dev/null 2>&1; then
-            gh pr edit "$BR" --title "$TITLE" --body "$BODY"
+          if [ -n "$SESS" ] && [ -f "$SESS" ]; then
+            BODY_FILE="$SESS"
           else
-            gh pr create --draft --base main --head "$BR" --title "$TITLE" --body "$BODY"
+            BODY_FILE=".github/PULL_REQUEST_TEMPLATE.md"
           fi
-          echo "PR draft pronto. Merge = gate humano."
+
+          # `gh pr view "$BR"` não detectou de forma confiável branches com '/'.
+          # A consulta explícita por repo/base/head evita tentativa duplicada.
+          set +e
+          PR_LIST_OUTPUT=$(gh pr list \
+            --repo "$REPO" \
+            --state open \
+            --base main \
+            --head "$BR" \
+            --json url \
+            --jq '.[0].url // ""' 2>&1)
+          PR_LIST_RC=$?
+          set -e
+
+          if [ "$PR_LIST_RC" -ne 0 ]; then
+            echo "::warning::Não foi possível consultar PR existente (exit $PR_LIST_RC)."
+            echo "$PR_LIST_OUTPUT"
+            echo "::notice::Use a comparação manual: $COMPARE_URL"
+            echo "comparison_url=$COMPARE_URL" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$PR_LIST_OUTPUT" ]; then
+            echo "PR existente mantido: $PR_LIST_OUTPUT"
+            echo "pr_url=$PR_LIST_OUTPUT" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          set +e
+          CREATE_OUTPUT=$(gh pr create \
+            --repo "$REPO" \
+            --draft \
+            --base main \
+            --head "$BR" \
+            --title "$TITLE" \
+            --body-file "$BODY_FILE" 2>&1)
+          CREATE_RC=$?
+          set -e
+
+          if [ "$CREATE_RC" -ne 0 ]; then
+            echo "::warning::Draft PR não pôde ser criado automaticamente (exit $CREATE_RC)."
+            echo "$CREATE_OUTPUT"
+            echo "::notice::Use a comparação manual: $COMPARE_URL"
+            echo "comparison_url=$COMPARE_URL" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Draft PR criado: $CREATE_OUTPUT"
+          echo "pr_url=$CREATE_OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "Merge e aprovação permanecem exclusivamente humanos."
