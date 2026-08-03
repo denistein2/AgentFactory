@@ -1,0 +1,20 @@
+# Postgres local descartável para os agentes.
+# 🚩 Casar a MAJOR VERSION com a do Supabase HOMOLOG. Supabase roda Postgres 15/17
+#    conforme o projeto — CONFIRMAR no dashboard antes de fixar. A imagem abaixo é
+#    supabase/postgres, que já traz as extensões que o schema usa (pgcrypto etc).
+# Um container = uma base "molde" (postgres). Cada missão vira um DATABASE separado
+# dentro dele (erp_agent_7730, erp_agent_compras) via 04_restore_mission.
+services:
+  agent-db:
+    image: supabase/postgres:15.8.1.020
+    container_name: stein-agent-db
+    environment:
+      POSTGRES_PASSWORD: local_only_not_secret
+      POSTGRES_DB: postgres
+    ports:
+      - "127.0.0.1:54329:5432"   # porta não-padrão para não colidir com outro Postgres local
+    volumes:
+      - stein_agent_pgdata:/var/lib/postgresql/data
+    # sem restart:always de propósito — é descartável, sobe quando precisa
+volumes:
+  stein_agent_pgdata:

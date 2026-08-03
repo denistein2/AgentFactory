@@ -1,0 +1,11 @@
+# 🚩 NADA de dado real entra no Git. A doutrina inteira depende disto.
+*.sql
+*.dump
+*.manifest.json
+*.salt
+# Exceções EXPLÍCITAS (sintéticos/fixtures nomeados — código, não dado real):
+!seeds/seed_7730.sql
+!sanitizer/fixtures/*.sql
+# docker/postgres
+pgdata/
+*.log

@@ -1,0 +1,77 @@
+# ============================================================================
+# .gitignore — denistein2/AgentFactory
+# INVARIANTE: dumps reais, dados reais e segredos NUNCA são versionados.
+# ============================================================================
+
+# Dados reais / dumps
+Testbank.sql
+*.sql.dump
+*.dump
+*_REAL.sql
+*_real.*
+dump_completo*
+**/real/**
+columns.json.real
+
+# Segredos (cada fábrica retém os seus)
+.env
+.env.*
+*.key
+*.pem
+*.crt
+credentials*.json
+secrets*.json
+*_secret*
+
+# Pacotes / binários pesados (vão pro Drive, não pro Git)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Execução / runtime
+*.pyc
+__pycache__/
+.venv/
+venv/
+node_modules/
+*.log
+*.tmp
+.docker/
+docker-volumes/
+*.pid
+fingerprints_out/
+evidence_out/
+
+# Triagem (fora do Git)
+_conflitos_decidir/
+_work/
+_inventory/
+
+# SO / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# --- Reforço P1-ORG-02 (parecer) ---
+*.bak
+*.old
+*~
+*.sqlite
+*.sqlite3
+*.db
+*.mdb
+*.bak.*
+backup*/
+exports_raw/
+*.pdf.dump
+*.csv.real
+# Arquivos grandes (usar Drive)
+*.iso
+*.img
+*.bin

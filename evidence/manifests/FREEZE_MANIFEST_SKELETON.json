@@ -1,0 +1,23 @@
+{
+  "manifest_spec": "CROSSAUDIT-FREEZE",
+  "manifest_version": "v001",
+  "mission_id": "EXCHANGE-CROSSAUDIT-XXX",
+  "artifact": {
+    "builder": "",
+    "filename": "",
+    "path": "",
+    "size_bytes": 0,
+    "sha256": ""
+  },
+  "freeze": {
+    "frozen_at": "",
+    "declaration": "Nenhuma versão posterior deste artefato existe neste instante.",
+    "no_later_version_exists": true
+  },
+  "provenance": {
+    "sources_used": [],
+    "assumptions": [],
+    "decisions_not_taken": []
+  },
+  "blind_construction_confirmed": true
+}

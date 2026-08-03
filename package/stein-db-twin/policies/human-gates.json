@@ -1,0 +1,24 @@
+{
+  "_doc": "Ações que SEMPRE exigem decisão humana, mesmo no fluxo automatizado. Fail-closed.",
+  "always_require_human": [
+    "database_ddl_on_homolog",
+    "database_adjust_on_homolog",
+    "grant_change",
+    "public_api_signature_change",
+    "production_deploy",
+    "git_push",
+    "pull_request_merge",
+    "business_rule_decision"
+  ],
+  "guards": {
+    "max_cycles": 3,
+    "fail_closed": true,
+    "sql_on_homolog": "human_only",
+    "commit": "human_approval",
+    "push": "human_approval",
+    "unknown_fact": "stop",
+    "conflicting_evidence": "human_gate",
+    "unmapped_pii_column": "stop_and_report"
+  },
+  "_note": "unmapped_pii_column: se o sanitizador vir coluna candidata a PII fora do columns.json, PARA — não deixa passar. Isso força revisão humana de campo novo antes de dado sair do HOMOLOG."
+}

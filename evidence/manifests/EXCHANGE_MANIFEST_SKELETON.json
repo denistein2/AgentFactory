@@ -1,0 +1,47 @@
+{
+  "manifest_spec": "EXCHANGE-01",
+  "manifest_version": "v001",
+  "transfer_id": "EXCHANGE-01-20260802-001",
+  "classification": "SYNTHETIC",
+  "created_at": "2026-08-02T14:44:01-0300",
+  "executor": "",
+  "source": {
+    "system": "GOOGLE_DRIVE",
+    "path": "Stein Agent Factory/Exchange/10_INBOX/2026-08-02T144100-0300__EXCHANGE-01__entrada_teste__v001.md",
+    "size_bytes": 0,
+    "sha256": "",
+    "sha256_provenance": "FIRST_MATERIALIZED_COPY"
+  },
+  "local_input": {
+    "path": "",
+    "size_bytes": 0,
+    "sha256": "",
+    "integrity_status": "PENDING"
+  },
+  "classification_result": {
+    "label": "SYNTHETIC",
+    "pii_detected": false,
+    "decision": "PENDING",
+    "released_from_quarantine": false
+  },
+  "local_output": {
+    "path": "",
+    "size_bytes": 0,
+    "sha256": ""
+  },
+  "drive_output": {
+    "path": "",
+    "size_bytes": 0,
+    "sha256_after_redownload": "",
+    "integrity_status": "PENDING"
+  },
+  "capabilities": {
+    "drive_list": false,
+    "drive_read_metadata": false,
+    "drive_read": false,
+    "drive_write": false,
+    "drive_create_folder": false,
+    "drive_move": false
+  },
+  "result": "PENDING"
+}
