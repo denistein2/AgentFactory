@@ -1,83 +1,77 @@
 # AgentFactory — Stein Agent Factory
 
-Repositório de governança, planejamento e código sob custódia da **Stein Agent
-Factory**. A árvore organiza a construção de *database twins* descartáveis para
-testes isolados do ERP Food Control, sem introduzir dados reais e sem autorizar
-acesso a HOMOLOG, Supabase remoto ou produção.
+Repositório de governança, planejamento e código sob custódia da **Stein Agent Factory**.
 
-> **Responsável pelos gates e pelo merge:** Denis Stein.  
+> **Responsável pelos Gates e pelo merge:** Denis Stein.  
 > **Regra permanente:** `coerência documental ≠ reprodução de execução ≠ auditoria de código`.
 
-## Estado ORG-001
+## Estado atual verificado
 
 ```text
-STATUS: STAGING VALIDADO — BLOCKED_BASE_BRANCH
-Arquivos na árvore: 90
-Arquivos inventariados: 89 (INVENTORY_BASELINE.csv exclui a si próprio)
-GitHub: nenhuma tag criada; factory/v1.0.0-foundation somente após merge humano
-PR: agente pode criar branch, validar, commitar, enviar a branch e abrir/atualizar Draft PR
-Merge: exclusivamente humano; push direto em main proibido
+last_verified_at: 2026-08-21T15:18:00-03:00
+verified_main: 918387376620f6985baeb14965c7245131114b49
+main: EXISTE
+ORG-001: MERGEADO via PR #1
+Issue #2: COMPLETED; objeto de governança REPROVADO para expansão de autonomia
+Issue #3: HUMAN GATE APROVADO; correção preparada em branch de sessão
 DBTWIN-002: Gate 02-A NÃO APROVADO; Gate 02-B indisponível
-Bloqueio Git: repositório remoto sem heads/main; requer main mínima como base do PR
+merge desta correção: NÃO AUTORIZADO automaticamente
 ```
 
-## O que esta baseline é — e o que não é
+O bloco acima substitui como estado atual as declarações antigas `BLOCKED_BASE_BRANCH` / `main ausente`. A contagem `90 arquivos / 89 inventariados` pertence à baseline ORG-001 de 2026-08-02 e não deve ser tratada como contagem atual sem nova verificação.
 
-Esta é uma baseline organizacional com uma fonte técnica legada sob custódia. Ela
-não afirma paridade do DB Twin, conclusão da DBTWIN-002, aprovação de Gate 02-A
-ou 02-B, reprodução do pipeline nem auditoria técnica integral.
+## Como resolver “o que vale agora”
 
-A fonte importada está classificada como `IMPORTED_UNAUDITED_LEGACY_SOURCE` e
-**não está autorizada para execução**. Nesta reconciliação foram permitidos apenas
-validação estática, compilação e `sanitize_v2.py --self-test` local.
+A Factory separa duas perguntas:
 
-## Verdade de versão
+1. **Autoridade semântica:** `GOVERNANCE.md` → M17/M18 → decisões em `docs/governance/decisions/current/` → Gate → contrato → plano → specs/matrizes.
+2. **Identidade/estado atual:** ref Git observada + path real + lifecycle + `last_verified_at`, conforme `docs/governance/FACTORY_LOGBOOK.md` e `docs/governance/PROVENANCE_STANDARD.md`.
 
-| Item | Versão/estado | Situação |
-|---|---|---|
-| Fábrica / repositório | `factory/v1.0.0-foundation` | somente após merge humano |
-| Fonte técnica importada | `v0.2` | 15 arquivos sob custódia, não auditados integralmente |
-| Pacote `v0.3-phase01` | evidência documental | pacote-fonte original ainda não localizado nem reconciliado |
+Um handoff, snapshot, documento histórico ou arquivo que diga “canônico” no próprio corpo **não se torna current por isso**. A posição, o lifecycle e a última verificação precisam concordar.
 
-## Estrutura
+## Estrutura observada no repositório
 
 ```text
 AgentFactory/
-├─ README.md · CHANGELOG.md · GOVERNANCE.md · SECURITY.md
-├─ .github/            workflows e template de PR
-├─ docs/               governança, missões, sessões, handoffs e auditorias
-├─ package/stein-db-twin/   fonte v0.2 sob custódia + _IMPORT_STATUS.md
-├─ evidence/           hashes, manifestos e relatórios
-├─ tools/              inventário e validação
-├─ templates/          missão, handoff, decisão, auditoria e PR
-└─ archive/            histórico, superseded e quarentena
+├─ README.md · CHANGELOG.md · GOVERNANCE.md · SECURITY.md · SESSION_CLOSE_PROTOCOL.md
+├─ .github/                         workflows e template de PR
+├─ docs/
+│  ├─ governance/                   regras, decisões, padrões e políticas
+│  ├─ missions/                     contratos e pacotes por missão
+│  ├─ sessions/                     registros cronológicos de sessão
+│  ├─ handoffs/                     handoffs preservados; não são current-state por si só
+│  └─ audits/
+├─ package/stein-db-twin/           fonte v0.2 sob custódia
+├─ evidence/                        hashes, manifestos e relatórios
+├─ tools/
+├─ templates/
+└─ archive/                         histórico, superseded e quarentena
 ```
 
 ## GitHub × Drive
 
-- **GitHub:** documentação canônica, código sob custódia, decisões, contratos,
-  missões, PRs e histórico versionado.
-- **Drive:** pacotes/evidências pesadas e releases. Para cada artefato destinado
-  ao Drive, registrar nome, SHA-256 e URL; não copiar binários para o Git.
+- **GitHub:** verdade versionada de governança, código sob custódia, decisões, contratos, missões, sessões e PRs.
+- **Drive:** custódia/intercâmbio e evidência externa/pesada. Conteúdo do Drive entra como evidência a reconciliar; não vira autoridade do repo automaticamente.
 
-## Ordem de leitura
+## Ordem de leitura para um novo agente
 
-1. `GOVERNANCE.md`
-2. `docs/governance/M17_FRONTEIRA_EXECUTOR.md`
-3. `package/stein-db-twin/_IMPORT_STATUS.md`
-4. `docs/missions/AGENT-FACTORY-DBTWIN-002/README.md`
-5. `docs/missions/AGENT-FACTORY-DBTWIN-002/PLAN_DBTWIN_002.md`
+1. `README.md`
+2. `GOVERNANCE.md`
+3. `docs/governance/FACTORY_LOGBOOK.md`
+4. `docs/governance/PROVENANCE_STANDARD.md`
+5. `docs/governance/MISSION_MANIFEST_STANDARD.md`
+6. `docs/governance/AGENT_ROUTING_HEURISTIC.md`
+7. M17/M18 e decisões `current/`
+8. somente então o pacote da missão relevante
 
-## Pendências canônicas
+## DBTWIN-002 — estado preservado
 
-- **PEND-1:** fonte autoritativa do schema-only.
-- **PEND-2A — RESOLVIDA:** `columns.json` localizado e mantido sob custódia.
-- **PEND-2B — ABERTA:** auditoria técnica de `columns.json`.
-- **PEND-2C — ABERTA:** cruzamento `cells_masked=24 × columns.json`.
-- **PEND-2D — ABERTA:** dependência de `columns.json` no fluxo schema-only.
-- **PEND-3 — ABERTA:** porta 54329 no código legado versus 55439 na governança.
-- Pacote-fonte original `v0.3-phase01`, scripts 00 e 05–10,
-  `artifacts/phase01`, fixtures/manifests completos e evidências E2E/fingerprints
-  da Fase 01 continuam ausentes.
+A correção de governança **não** executa nem reabre tecnicamente DBTWIN-002.
 
-Nenhum dump, dado real ou segredo deve entrar nesta árvore.
+- PEND-1: fonte autoritativa do schema-only — aberta.
+- PEND-2A: localização/custódia de `columns.json` — resolvida.
+- PEND-2B/2C/2D — abertas.
+- PEND-3 — aberta.
+- pacote-fonte original `v0.3-phase01`, scripts 00 e 05–10, `artifacts/phase01` e evidências E2E/fingerprints continuam conforme o estado documental anterior, sem nova alegação de custódia.
+
+Nenhum dump, dado real, PII ou segredo deve entrar nesta árvore.
