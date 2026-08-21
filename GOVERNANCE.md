@@ -1,54 +1,70 @@
 # GOVERNANCE — Stein Agent Factory
 
-Regras canônicas de governança. Este arquivo indexa; os documentos detalhados
-vivem em `docs/governance/`.
+Regras canônicas de governança. Este arquivo indexa; os documentos detalhados vivem em `docs/governance/`.
 
-## Autoridade e precedência
+## 1. Autoridade semântica
 
-`M17/M18 → decisões atuais → Gate → contrato → plano-mestre → especificações → matriz`
+Quando a pergunta é **qual regra/decisão governa o comportamento**, vale:
 
-- **M17 — Fronteira do Executor** (`docs/governance/M17_FRONTEIRA_EXECUTOR.md`):
-  o executor local roda comandos mecânicos; Denis decide os gates; Denis não é
-  barramento de comandos.
-- **M18 — Decisão Humana Substitutiva e Não-Reabertura**
-  (`docs/governance/M18_DECISAO_HUMANA_SUBSTITUTIVA.md`): Claude alerta uma vez,
-  registra a decisão humana e não reabre a mesma objeção sem novo fato. M18 não
-  desloca obrigações legais, políticas de provedor nem requisitos de segurança
-  inseparáveis da execução segura.
+```text
+M17/M18 → decisões atuais → Gate → contrato → plano-mestre → especificações → matriz/relatório
+```
 
-## Princípios permanentes
+- **M17 — Fronteira do Executor** (`docs/governance/M17_FRONTEIRA_EXECUTOR.md`): o executor realiza operações mecânicas dentro do escopo autorizado; Denis decide Gates.
+- **M18 — Decisão Humana Substitutiva** (`docs/governance/M18_DECISAO_HUMANA_SUBSTITUTIVA.md`): o agente alerta uma vez, a decisão humana posterior prevalece no escopo registrado e o histórico não é apagado.
 
-1. **Taxonomia de evidência:** `coerência documental ≠ reprodução de execução ≠ auditoria de código`.
-2. **Preservar antes de limpar** — nada é apagado antes de inventário, hash e gate.
-3. **Hash antes de decidir** — duplicidade se resolve por SHA-256, não por nome.
-4. **Mesmo nome ≠ mesmo conteúdo.**
-5. **ZIP/TAR não é fonte canônica** — só transporte/release/evidência.
-6. **Não-erasura** — conteúdo substituído vai para `history`/`superseded` com referência ao sucessor, nunca deletado.
-7. **Divulgação honesta** — ações temporárias (ex.: um `git init` revertido) são registradas, não apagadas.
-8. **Fonte única por tipo de artefato** — um documento canônico por artefato.
+## 2. Resolução de current-state
 
-## Dois gates da Fase 02
+Autoridade semântica e estado atual são dimensões diferentes. Para claims sobre **onde está**, **qual versão existe**, **qual lifecycle vale**, **qual branch/ref foi observada** ou **se algo ainda está pendente**, resolver nesta ordem:
 
-- **Gate 02-A** — preparação estática (sem container). Versionamento é saída, não entrada.
-- **Gate 02-B** — execução (sobe container). Primeira etapa: B0 — preflight de isolamento.
+1. ref/commit Git explicitamente observado;
+2. path real existente nessa ref;
+3. lifecycle explícito (`CURRENT`, `ACTIVE_MISSION`, `HISTORICAL`, `SUPERSEDED`, `IMPORTED_UNAUDITED`, `EXTERNAL_CONTEXT`);
+4. `last_verified_at` e proveniência;
+5. somente depois, texto de plano, handoff ou snapshot histórico.
 
-Estado: `CANDIDATO A GATE 02-A — NÃO APROVADO`.
+`docs/governance/FACTORY_LOGBOOK.md` é o índice temporal mínimo. Ele **não substitui M17/M18 nem decisões atuais**; resolve current-state e aponta a fonte verificada.
 
-## Protocolos de fábrica
+Regra crítica: **um documento não prova que continua atual apenas porque seu corpo diz “canônico”, “atual” ou “única árvore válida”.**
 
-- `docs/governance/PROTOCOLO_EXCHANGE_01.md` — transferência Drive↔Local (sintético).
-- `docs/governance/PROTOCOLO_CROSSAUDIT_01.md` — dupla construção + auditoria cruzada (caro; não é o modo padrão).
-- `SESSION_CLOSE_PROTOCOL.md` (raiz) — fechamento obrigatório de sessão + PR autônomo.
+## 3. Padrões transversais
 
-## Fechamento de sessão e PR
+- `docs/governance/PROVENANCE_STANDARD.md` — proveniência mínima de claims materiais.
+- `docs/governance/MISSION_MANIFEST_STANDARD.md` — identidade da missão, executor solicitado/real, timestamps, permissões e evidência.
+- `docs/governance/AGENT_ROUTING_HEURISTIC.md` — seleção por capacidade/risco/reversibilidade antes de provider/modelo.
+- `docs/governance/FACTORY_LOGBOOK.md` — timeline + índice de current-state.
 
-Toda sessão que altera o projeto termina com branch de sessão, validação, commit,
-push da branch e abertura ou atualização de Draft PR, quando houver base remota e
-autenticação. O agente está autorizado a executar essas etapas sem nova
-confirmação. **Push direto em `main` é proibido e merge é sempre exclusivamente
-humano.** Ver `SESSION_CLOSE_PROTOCOL.md`.
+Esses padrões foram preparados por `GOVERNANCE-RESET-FACTORY-001`; tornam-se governança da `main` somente após merge humano do PR correspondente.
 
-As políticas encontradas dentro de fontes importadas, inclusive
-`package/stein-db-twin/policies/human-gates.json` e `permissions.json`, são
-políticas legadas subordinadas a esta governança raiz; preservá-las não altera a
-fronteira vigente.
+## 4. Princípios permanentes
+
+1. `coerência documental ≠ reprodução de execução ≠ auditoria de código`.
+2. Preservar antes de limpar.
+3. Hash antes de decidir duplicidade.
+4. Mesmo nome ≠ mesmo conteúdo.
+5. ZIP/TAR é transporte/evidência, não fonte canônica por si só.
+6. Não-erasura: substituído vai para histórico/superseded com sucessor explícito.
+7. Divulgação honesta: desvios revertidos continuam registrados.
+8. Fonte única por tipo de artefato.
+9. `UNKNOWN`/`UNVERIFIED` é preferível a inferir identidade, modelo, horário ou estado.
+10. Issue/mission contract pode **restringir** permissões herdadas; não ampliá-las silenciosamente.
+
+## 5. DBTWIN-002
+
+- Gate 02-A — preparação estática, não aprovado.
+- Gate 02-B — execução/container, indisponível até 02-A e pré-condições.
+- Esta governança não autoriza Docker, Supabase, HOMOLOG, produção ou dado real.
+
+## 6. Protocolos
+
+- `docs/governance/PROTOCOLO_EXCHANGE_01.md` — transferência Drive↔Local sintética.
+- `docs/governance/PROTOCOLO_CROSSAUDIT_01.md` — dupla construção/auditoria cruzada; caro e não padrão.
+- `SESSION_CLOSE_PROTOCOL.md` — fechamento de sessão e Draft PR.
+
+Protocolos específicos podem nomear produtos/agentes para um experimento, mas não substituem a heurística genérica de routing.
+
+## 7. Fronteira Git
+
+Sessão que altera o projeto usa branch de sessão, validação, commit/push da branch e Draft PR. Push direto em `main` é proibido. **Merge é exclusivamente humano.**
+
+Políticas legadas em `package/stein-db-twin/` permanecem subordinadas a esta governança raiz.
