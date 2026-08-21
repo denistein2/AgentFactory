@@ -3,13 +3,13 @@ session_id: 2026-08-21-GOVERNANCE-RESET-FACTORY-001-01
 mission_id: GOVERNANCE-RESET-FACTORY-001
 issue: https://github.com/denistein2/AgentFactory/issues/3
 started_at: 2026-08-21T15:18:00-03:00
-finished_at: PENDING_POST_PR
-status: READY_FOR_DRAFT_PR
+finished_at: 2026-08-21T15:23:47-03:00
+status: DRAFT_PR_OPEN
 branch: session/2026-08-21/governance-reset-factory-001
 base_ref: main
 base_sha: 918387376620f6985baeb14965c7245131114b49
-commit: PENDING_POST_COMMIT
-pull_request: PENDING_POST_PR
+commit: a22ce5a2944aa4fb3d3a5382f47a73f212b1d937
+pull_request: https://github.com/denistein2/AgentFactory/pull/4
 actor_type: AI_AGENT
 requested_executor: ChatGPT project operator / autopilot
 actual_executor: ChatGPT
@@ -44,10 +44,7 @@ Denis aprovou **ESCOPO MÍNIMO** em 2026-08-21T15:18:00-03:00. Autorizado branch
 - README reconciliado com main existente e PR #1 mergeada;
 - GOVERNANCE separa autoridade semântica de current-state;
 - ESTRUTURA_CANONICA limitada ao pacote DBTWIN-002 e corrigida para paths reais;
-- criado `PROVENANCE_STANDARD.md`;
-- criado `MISSION_MANIFEST_STANDARD.md`;
-- criado `AGENT_ROUTING_HEURISTIC.md`;
-- criado `FACTORY_LOGBOOK.md`;
+- criados `PROVENANCE_STANDARD.md`, `MISSION_MANIFEST_STANDARD.md`, `AGENT_ROUTING_HEURISTIC.md` e `FACTORY_LOGBOOK.md`;
 - SESSION_CLOSE_PROTOCOL ampliado com executor solicitado/real, provider/model, ref/SHA, timestamps, evidência e `does_not_prove`;
 - README local da DBTWIN-002 passa a apontar para governança/logbook antes de resolver current-state.
 
@@ -61,7 +58,11 @@ Denis aprovou **ESCOPO MÍNIMO** em 2026-08-21T15:18:00-03:00. Autorizado branch
 
 ## 6. Validações
 
-A concluir pós-commit: compare `main...branch`, leitura de arquivos alterados, status/CI do Draft PR e verificação de ausência de merge.
+- compare após payload: branch `ahead_by=1`, `behind_by=0` contra a base;
+- 10 arquivos documentais/governança alterados; nenhum executável/dump/dado real adicionado;
+- Draft PR #4 criado como `draft=true`, base `main`, head `session/2026-08-21/governance-reset-factory-001`;
+- PR #4 não mergeado;
+- CI/checks ainda pertencem à etapa de revisão do Draft PR.
 
 ## 7. Desvios
 
@@ -75,10 +76,11 @@ Uma reação `eyes` foi adicionada acidentalmente ao PR #1 durante operação de
 
 ## 9. Pendências
 
+- CI/checks do Draft PR;
 - revisão humana do Draft PR;
 - merge humano se aprovado;
 - PENDs técnicos DBTWIN permanecem fora de escopo.
 
 ## 10. Próxima sessão
 
-Revisar Draft PR e decidir merge. Se mergeado, revalidar `main` e atualizar o snapshot do `FACTORY_LOGBOOK` numa sessão futura somente se o SHA/estado mudar materialmente.
+Revisar Draft PR #4 e decidir merge. Se mergeado, revalidar `main` e atualizar o snapshot do `FACTORY_LOGBOOK` somente quando o novo SHA for observado.

@@ -1,17 +1,18 @@
 # FACTORY_LOGBOOK — Current-state index + timeline
 
 **Função:** reconstruir estado sem transformar histórico em verdade atual.  
-**Status:** candidato canônico até merge humano da Issue #3.
+**Status:** candidato canônico até merge humano do Draft PR #4.
 
 ## Snapshot verificado
 
 ```yaml
-last_verified_at: 2026-08-21T15:18:00-03:00
+last_verified_at: 2026-08-21T15:23:47-03:00
 verified_ref: main
 verified_sha: 918387376620f6985baeb14965c7245131114b49
 observer: ChatGPT / OpenAI / GPT-5.6 Sol
-verifier: same-session connector readback
+verifier: same-session GitHub connector readback
 issue: 3
+draft_pr: 4
 ```
 
 ### Estado
@@ -19,7 +20,8 @@ issue: 3
 - `main` existe em `918387376620f6985baeb14965c7245131114b49`.
 - ORG-001 foi mergeado via PR #1 em 2026-08-03.
 - Issue #2 (`GOVERNANCE-FIELD-REPORT-001`) terminou `COMPLETED`; o objeto auditado foi `REPROVADO` para expansão de autonomia.
-- Issue #3 (`GOVERNANCE-RESET-FACTORY-001`) recebeu Gate Humano para preparar correção mínima em branch + Draft PR; merge segue humano.
+- Issue #3 (`GOVERNANCE-RESET-FACTORY-001`) recebeu Gate Humano para correção mínima.
+- Draft PR #4 está aberto na branch `session/2026-08-21/governance-reset-factory-001`; **a correção ainda não é canônica na main**.
 - DBTWIN-002 continua `Gate 02-A NÃO APROVADO`; o reset de governança não inicia Fase 02.
 
 ## Resolução de current-state
@@ -39,9 +41,9 @@ Para regra normativa, usar a precedência de `GOVERNANCE.md`.
 
 ## Claims stale identificados na base auditada
 
-| Fonte | Claim antigo | Estado em 2026-08-21 | Tratamento nesta missão |
+| Fonte | Claim antigo | Estado em 2026-08-21 | Tratamento no Draft PR #4 |
 |---|---|---|---|
-| `README.md` | `BLOCKED_BASE_BRANCH`, `main` ausente | falso | corrigido na branch da Issue #3 |
+| `README.md` | `BLOCKED_BASE_BRANCH`, `main` ausente | falso | corrigido |
 | `docs/missions/AGENT-FACTORY-DBTWIN-002/ESTRUTURA_CANONICA.md` | “única árvore válida” com paths `governance/`/`missions/` na raiz | não corresponde à árvore real | corrigido para árvore mission-local observada |
 | `docs/missions/AGENT-FACTORY-DBTWIN-002/PLAN_DBTWIN_002.md` e `VERSIONAMENTO_GIT.md` | exemplos/path textuais derivados da árvore antiga | históricos de planejamento; não resolvem current-state global | subordinados ao índice atual + ESTRUTURA corrigida; conteúdo técnico não reaberto |
 
@@ -61,6 +63,9 @@ ERP revela classe de falha: missão pode executar corretamente contra documenta�
 
 ### 2026-08-21 — Gate #3
 Denis aprova escopo mínimo de correção em branch/Draft PR. Não autoriza merge, DBTWIN-002, Docker, Supabase, produção ou dados reais.
+
+### 2026-08-21 — Draft PR #4
+Correção documental preparada. O PR permanece draft e requer revisão/merge humano; `main` continua inalterada até esse Gate.
 
 ## Regra de atualização
 
