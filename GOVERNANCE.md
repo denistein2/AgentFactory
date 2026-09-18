@@ -34,8 +34,23 @@ vivem em `docs/governance/`.
 
 Estado: `CANDIDATO A GATE 02-A — NÃO APROVADO`.
 
+## Bootstrap obrigatório de agentes
+
+Antes da primeira missão material de qualquer agente/executor novo, ou após mudança relevante de runtime, tooling ou permissões, executar o **AGASALHO-001**:
+
+- `docs/governance/AGASALHO_001_AGENT_ONBOARDING_PROTOCOL.md`
+
+O agente deve possuir um contrato próprio derivado de:
+
+- `templates/AGENT_CAPABILITY_PERMISSION_ENVELOPE.md`
+
+Sem envelope suficiente, a missão não deve ser disparada. O resultado pré-missão precisa ser `AGENT_READY` ou `AGENT_READY_WITH_SCOPED_ALLOWLIST`.
+
+A regra existe para evitar dois erros simétricos: bloquear o humano com aprovações de observação trivial e conceder autoridade implícita para consequências materiais.
+
 ## Protocolos de fábrica
 
+- `docs/governance/AGASALHO_001_AGENT_ONBOARDING_PROTOCOL.md` — onboarding obrigatório de capacidades, permissões, allowlists e Human Gates antes da primeira missão.
 - `docs/governance/PROTOCOLO_EXCHANGE_01.md` — transferência Drive↔Local (sintético).
 - `docs/governance/PROTOCOLO_CROSSAUDIT_01.md` — dupla construção + auditoria cruzada (caro; não é o modo padrão).
 - `SESSION_CLOSE_PROTOCOL.md` (raiz) — fechamento obrigatório de sessão + PR autônomo.
