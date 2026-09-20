@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **SUPERSEDED TEMPLATE — 2026-09-20**
+>
+> O template canônico agora é:
+> `templates/AGENTSPEC_TEMPLATE.md`
+>
+> Este arquivo permanece somente para rastreabilidade histórica do AGASALHO-001.
+
 # AGENT CAPABILITY & PERMISSION ENVELOPE — TEMPLATE
 
 > Derivado de: AGASALHO-001
