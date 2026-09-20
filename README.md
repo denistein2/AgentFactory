@@ -63,7 +63,7 @@ AgentFactory/
 ## Ordem de leitura
 
 1. `GOVERNANCE.md`
-2. `docs/governance/AGASALHO_001_AGENT_ONBOARDING_PROTOCOL.md` — obrigatório antes da primeira missão de agente novo
+2. `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md` — obrigatório antes da primeira missão material de um agente/executor
 3. `docs/governance/M17_FRONTEIRA_EXECUTOR.md`
 4. `package/stein-db-twin/_IMPORT_STATUS.md`
 5. `docs/missions/AGENT-FACTORY-DBTWIN-002/README.md`
