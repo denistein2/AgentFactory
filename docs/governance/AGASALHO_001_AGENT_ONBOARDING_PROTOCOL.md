@@ -1,3 +1,15 @@
+> [!IMPORTANT]
+> **SUPERSEDED / HISTORICAL ORIGIN — 2026-09-20**
+>
+> Este documento preserva a origem histórica do conceito **AGASALHO-001**.
+> A nomenclatura e o contrato canônicos passaram a ser **AgentSpec**, definidos em:
+> `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md`
+>
+> Não usar AGASALHO-001 como contrato operacional ativo em novas Missions.
+> O termo AGASALHO permanece apenas como codinome/marco histórico.
+>
+> Nenhum conteúdo histórico abaixo foi removido.
+
 # AGASALHO-001 — Protocolo de Onboarding de Capacidade, Permissões e Envelope de Execução de Agentes
 
 > Status: CANDIDATO CANÔNICO
