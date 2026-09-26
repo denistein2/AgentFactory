@@ -1,6 +1,6 @@
 # FACTORY_LOGBOOK — Current-state index + timeline
 
-**Função:** reconstruir estado sem transformar histórico em verdade atual.  
+**Função:** reconstruir estado sem transformar histórico em verdade atual.
 **Status:** CANONICAL em `main` desde a PR #4.
 
 ## Snapshot externo revalidado

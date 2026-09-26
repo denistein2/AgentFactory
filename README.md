@@ -2,7 +2,7 @@
 
 Repositório de governança, planejamento e código sob custódia da **Stein Agent Factory**.
 
-> **Responsável pelos Gates e pelo merge:** Denis Stein.  
+> **Responsável pelos Gates e pelo merge:** Denis Stein.
 > **Regra permanente:** `coerência documental ≠ reprodução de execução ≠ auditoria de código`.
 
 ## Estado atual verificado
