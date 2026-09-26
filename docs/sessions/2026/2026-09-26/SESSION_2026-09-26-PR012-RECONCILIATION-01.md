@@ -98,3 +98,14 @@ Depois retornar:
 `READY_FOR_HUMAN_GATE` ou defeito mínimo.
 
 **Merge permanece exclusivamente humano.**
+
+
+## 8. Desvio operacional registrado
+
+Durante a reconstrução da branch sobre a nova `main`, houve um intervalo em que o head da branch ficou exatamente igual à base. O GitHub fechou automaticamente a PR #12 nesse estado transitório. Após a criação do commit reconciliado, a PR #12 foi reaberta.
+
+Este desvio:
+- não produziu merge;
+- não alterou `main`;
+- não perdeu o head anterior, que já estava preservado na branch de holding;
+- não alterou runtime ou ambientes externos.
