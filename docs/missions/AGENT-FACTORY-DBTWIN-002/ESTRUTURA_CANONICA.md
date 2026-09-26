@@ -1,125 +1,99 @@
-# ESTRUTURA_CANONICA — Árvore única e precedência documental
+# ESTRUTURA_CANONICA — Paths do pacote DBTWIN-002 no repositório atual
 
-**Missão:** AGENT-FACTORY-DBTWIN-002
-**Status:** planejamento. Define a árvore canônica ÚNICA do pacote e a ordem de precedência entre documentos.
-**Data:** 01/08/2026
+**Missão:** AGENT-FACTORY-DBTWIN-002  
+**Lifecycle:** `ACTIVE_MISSION`  
+**Última reconciliação de paths:** 2026-08-21  
+**Base observada:** `main @ 918387376620f6985baeb14965c7245131114b49`
 
-> Corrige P1-01 (paths divergentes entre plano/README e estratégia Git) e
-> P1-02 (hierarquia de autoridade contraditória). Esta é a **única** árvore
-> válida; todos os links relativos do pacote seguem-na.
+> Este documento é canônico **somente para a organização interna do pacote DBTWIN-002**. Ele não define a árvore global da Factory e não resolve sozinho current-state. Para isso: `GOVERNANCE.md` + `docs/governance/FACTORY_LOGBOOK.md`.
 
----
+## 1. Paths reais relevantes
 
-## 1. Árvore canônica única
-
-```
-AgentFactory/                                  # raiz do repositório denistein2/AgentFactory
+```text
+AgentFactory/
 ├─ README.md
-├─ .gitignore
-├─ governance/
-│  ├─ M17_FRONTEIRA_EXECUTOR.md                # canônico do projeto (a incluir; ver P2-05)
-│  ├─ M18_DECISAO_HUMANA_SUBSTITUTIVA.md       # canônico do projeto (a incluir; ver P1-03)
-│  └─ decisions/
-│     ├─ current/
-│     │  └─ DECISAO_SUBSTITUTIVA_SCHEMA_ONLY.md
-│     └─ history/
-│        ├─ 2026-07-31_DECISAO_DUMP_COMPLETO__ORIGINAL.md   # bytes intactos do original
-│        └─ 2026-08-01_STATUS_SUBSTITUICAO_DUMP_COMPLETO.md # marcador de status (só referencia)
-├─ missions/
-│  ├─ DBTWIN-001/
-│  │  └─ HANDOFF_DBTWIN_001.md                 # canônico da 001 (a incluir; ver P2-05)
-│  └─ DBTWIN-002/
-│     ├─ PLAN_DBTWIN_002.md                    # documento-mestre / índice / estado
-│     ├─ ESTRUTURA_CANONICA.md                 # este arquivo
-│     └─ docs/
+├─ GOVERNANCE.md
+├─ SESSION_CLOSE_PROTOCOL.md
+├─ docs/
+│  ├─ governance/
+│  │  ├─ M17_FRONTEIRA_EXECUTOR.md
+│  │  ├─ M18_DECISAO_HUMANA_SUBSTITUTIVA.md
+│  │  ├─ decisions/
+│  │  │  ├─ current/DECISAO_SUBSTITUTIVA_SCHEMA_ONLY.md
+│  │  │  ├─ history/2026-07-31_DECISAO_DUMP_COMPLETO__ORIGINAL.md
+│  │  │  ├─ history/2026-08-01_STATUS_SUBSTITUICAO_DUMP_COMPLETO.md
+│  │  │  └─ pending/
+│  │  └─ policies/POLITICA_ISOLAMENTO_REDE.md
+│  └─ missions/
+│     ├─ AGENT-FACTORY-DBTWIN-001/HANDOFF_DBTWIN_001.md
+│     └─ AGENT-FACTORY-DBTWIN-002/
+│        ├─ README.md
+│        ├─ PLAN_DBTWIN_002.md
+│        ├─ ESTRUTURA_CANONICA.md
 │        ├─ CONTRATO_FASE_02.md
-│        ├─ GATE_HUMANO_FASE_02.md             # contém Gate 02-A e Gate 02-B
 │        ├─ VERSIONAMENTO_GIT.md
 │        ├─ ORIGEM_SCHEMA_ONLY.md
-│        ├─ POLITICA_ISOLAMENTO_REDE.md
 │        ├─ ESTRATEGIA_AUDITORIA.md
 │        ├─ VALIDACAO_SUPABASE.md
 │        ├─ FIXTURES_SINTETICAS.md
 │        ├─ MATRIZ_RASTREABILIDADE.md
-│        ├─ MATRIZ_DEPENDENCIA_FASE01.md       # P0-06: dependência dos artefatos legados
+│        ├─ MATRIZ_DEPENDENCIA_FASE01.md
+│        ├─ gates/GATE_HUMANO_FASE_02.md
+│        ├─ gates/pending/
 │        └─ specs/
-│           ├─ EVIDENCE_MANIFEST_SPEC.md       # P0-08
-│           ├─ SCHEMA_INVENTORY_SPEC.md        # P0-08
-│           ├─ FINGERPRINT_SPEC.md             # P0-02 / P0-08
-│           ├─ SCHEMA_SOURCE_MANIFEST.md       # P0-04 (gabarito; fonte pendente)
-│           └─ PACKAGE_IMPORT_MANIFEST.md      # P1-14 (cadeia de custódia)
-└─ package/
-   └─ stein-db-twin/                           # scripts 00–10, sanitize_v2.py, columns.json (após auditoria/custódia)
+│           ├─ EVIDENCE_MANIFEST_SPEC.md
+│           ├─ SCHEMA_INVENTORY_SPEC.md
+│           ├─ FINGERPRINT_SPEC.md
+│           ├─ SCHEMA_SOURCE_MANIFEST.md
+│           └─ PACKAGE_IMPORT_MANIFEST.md
+└─ package/stein-db-twin/
 ```
 
-> **Nota sobre este pacote de planejamento:** os arquivos entregues nesta sessão
-> correspondem aos de `missions/DBTWIN-002/` e às decisões em
-> `governance/decisions/`. Os itens marcados "a incluir" (M17, M18, HANDOFF,
-> `.gitignore`, pacote `stein-db-twin`) são pré-condições de completude, não
-> conteúdo produzível por suposição — ver classificação em P2-05 abaixo.
+A árvore antiga que colocava `governance/` e `missions/` diretamente na raiz é **SUPERSEDED como descrição de path**. Ela permanece recuperável no histórico Git; não deve ser usada para resolver arquivos atuais.
 
----
+## 2. Precedência
 
-## 2. Precedência documental (corrige P1-02)
+A precedência global vem de `GOVERNANCE.md`:
 
-Em qualquer divergência, vale a ordem abaixo (do mais forte ao mais fraco):
-
-```
-1. Governança canônica M17 / M18
-2. Decisões humanas atuais (governance/decisions/current/)
-3. Gate humano preenchido e vinculado a commit
-4. Contrato da missão (CONTRATO_FASE_02.md)
-5. Plano-mestre (PLAN_DBTWIN_002.md)
-6. Especificações técnicas (docs/ e docs/specs/)
-7. Matriz e relatórios
+```text
+M17/M18
+→ decisões atuais
+→ Gate
+→ contrato
+→ plano-mestre
+→ especificações
+→ matriz/relatório
 ```
 
-**Regra de correção obrigatória:** quando um documento de nível inferior
-contradiz o plano-mestre, a divergência **não** é resolvida ignorando o
-plano-mestre — ela gera **obrigação de atualizar o plano-mestre** para refletir
-a fonte correta. O plano-mestre é mapa; um mapa errado se corrige, não se
-abandona.
+Este arquivo resolve **path do pacote**, não substitui conteúdo normativo de nível superior.
 
-> Isto substitui a formulação anterior do plano ("o documento-satélite prevalece
-> sobre o resumo"), que transformava o mestre numa fonte que podia estar errada
-> sem ser atualizada.
+## 3. Completude observada
 
----
+Presentes na base observada:
 
-## 3. Classificação de completude dos documentos ausentes (P2-05)
+- `.gitignore`;
+- M17/M18;
+- `HANDOFF_DBTWIN_001.md`;
+- decisão atual schema-only + histórico original/marcador;
+- pacote `package/stein-db-twin/` sob custódia v0.2;
+- `columns.json` sob custódia conforme `_IMPORT_STATUS.md`.
 
-| Documento | Classe |
-|---|---|
-| `.gitignore` | obrigatório antes do Gate 02-A |
-| `M17_FRONTEIRA_EXECUTOR.md` | obrigatório antes do Gate 02-A (canônico existente, a incluir no repo) |
-| `M18_DECISAO_HUMANA_SUBSTITUTIVA.md` | obrigatório antes do Gate 02-A (canônico existente, a incluir no repo) |
-| `HANDOFF_DBTWIN_001.md` | obrigatório antes do Gate 02-A (canônico existente, a incluir no repo) |
-| `2026-07-31_DECISAO_DUMP_COMPLETO__ORIGINAL.md` (bytes intactos) | obrigatório antes do Gate 02-A |
-| `SCHEMA_SOURCE_MANIFEST.md` preenchido | obrigatório antes do Gate 02-B |
-| pacote `stein-db-twin` sob custódia | obrigatório antes do Gate 02-B |
-| `columns.json` | **condicional** (ver regra abaixo) |
+Continuam pendentes nos termos técnicos da DBTWIN-002: fonte autoritativa schema-only, auditorias/artefatos indicados no `PLAN_DBTWIN_002.md` e demais PENDs. Esta reconciliação de path não resolve essas pendências.
 
-## 4. Validação de referências de caminho
+## 4. Regra de `columns.json`
 
-Antes de qualquer commit (Gate 02-A em diante), rodar **validação de referências
-de caminho** contra esta árvore. Referência que não resolve é falha de
-pré-condição, não detalhe editorial. (Os documentos usam **referências textuais**
-entre crases, não links Markdown; o relatório de validação as classifica em:
-referência válida, arquivo declarado mas ausente, caminho inválido, referência
-não concreta, link Markdown real.)
-
-## 5. Regra canônica de `columns.json` (padrão único — corrige P0-REV-04)
-
-Vale em **todos** os documentos do pacote:
-
-```
-Enquanto a MATRIZ_DEPENDENCIA_FASE01 estiver inconclusiva:
+```text
+Enquanto MATRIZ_DEPENDENCIA_FASE01 estiver inconclusiva:
   columns.json permanece BLOQUEANTE.
 
-Se a inspeção confirmar dependência do fluxo schema-only:
-  columns.json é OBRIGATÓRIO antes do Gate 02-B.
+Se inspeção confirmar dependência do schema-only:
+  obrigatório antes do Gate 02-B.
 
-Se a inspeção provar ausência de dependência:
-  columns.json é reclassificado como PENDÊNCIA HISTÓRICA da Fase 01;
-  NÃO bloqueia a DBTWIN-002.
+Se inspeção provar ausência de dependência:
+  reclassificar como pendência histórica da Fase 01;
+  não bloquear DBTWIN-002.
 ```
+
+## 5. Validação de referência
+
+Referência textual deve resolver contra o path real da ref auditada. Se o documento precisar mencionar um path histórico/proposto, deve rotulá-lo como histórico/proposto; não apresentá-lo como árvore atual.

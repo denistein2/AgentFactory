@@ -2,17 +2,11 @@
 
 ## Regra
 
-Toda sessão que altere arquivos do projeto deve terminar com PR.
+Toda sessão que altere arquivos do projeto termina com branch de sessão, validação, commit/push da branch e Draft PR quando GitHub estiver disponível. Push direto em `main` é proibido. Merge permanece exclusivamente humano.
 
-O agente pode, autonomamente, criar a branch de sessão, validar, fazer commit,
-enviar essa branch e abrir ou atualizar o Draft PR. Push direto em `main` é
-proibido. O merge permanece exclusivamente humano.
+Sessão consultiva/read-only pode terminar sem PR, mas deve registrar resultado na Issue quando a missão exigir.
 
-## Exceções
-
-Uma sessão puramente consultiva, sem alteração no repositório, registra apenas uma nota de sessão quando necessário.
-
-## Fechamento mínimo
+## Registro mínimo
 
 Criar:
 
@@ -20,38 +14,63 @@ Criar:
 docs/sessions/YYYY/YYYY-MM-DD/SESSION_<ID>.md
 ```
 
-Preencher:
+Frontmatter mínimo:
 
 ```yaml
 ---
 session_id:
-date:
-mission:
-platform:
+mission_id:
+issue:
+started_at:
+finished_at:
 status:
 branch:
+base_ref:
+base_sha:
 commit:
 pull_request:
+actor_type:
+requested_executor:
+actual_executor:
+provider:
+product_agent:
+model_reported:
+role:
+run_id:
+evidence_strength:
+does_not_prove:
 ---
 ```
 
-Seções:
+Quando um campo não for comprovável, usar `UNKNOWN` ou `UNVERIFIED`; nunca inferir modelo, executor, session/run id ou timestamp histórico.
+
+As seções mínimas continuam:
 
 1. Objetivo
 2. Estado recebido
-3. Decisões
+3. Decisões/Gates
 4. Alterações
-5. Evidências
+5. Evidências e proveniência
 6. Validações
 7. Desvios
 8. Riscos
 9. Pendências
 10. Próxima sessão
 
-## Automação pretendida
+Se a sessão alterar current-state material, atualizar também `docs/governance/FACTORY_LOGBOOK.md` com fonte/ref e `last_verified_at`.
+
+## Automação
 
 ```text
-branch -> validate -> commit -> push -> draft PR -> CI -> human gate
+human gate (quando exigido)
+→ branch
+→ mutate within scope
+→ validate
+→ session record
+→ commit/push branch
+→ draft PR
+→ CI
+→ human review/merge gate
 ```
 
 ## Branch
@@ -62,12 +81,12 @@ session/YYYY-MM-DD/<missao>-<slug>
 
 ## Commit
 
-Preferir Conventional Commits:
+Preferir Conventional Commits, por exemplo:
 
 ```text
-docs(dbtwin): reconcile Gate 02-A package
-chore(repo): classify imported artifacts
+docs(governance): reconcile current-state provenance
 fix(manifest): correct package references
+chore(repo): classify imported artifacts
 ```
 
 ## PR
@@ -82,14 +101,11 @@ Corpo mínimo:
 
 ```markdown
 ## Objetivo
-
 ## Alterações
-
-## Decisões
-
+## Decisões/Gates
 ## Evidências e validações
-
 ## Riscos e pendências
+## Não prova / não escopo
 
 ## Gate
 - [ ] CI verde
@@ -99,37 +115,19 @@ Corpo mínimo:
 - [ ] Revisão humana
 ```
 
+## Validação mínima
+
+- referências/path dos arquivos alterados;
+- secret scan;
+- bloqueio de dumps/dados reais;
+- JSON/YAML quando alterados;
+- diff contra base SHA;
+- coerência de current-state (`README`/`GOVERNANCE`/`FACTORY_LOGBOOK`) quando aplicável.
+
 ## Bloqueios
 
-Se não houver GitHub/autenticação:
-
-```text
-status: BLOCKED_GITHUB
-```
-
-A sessão deve gerar:
-
-- branch local;
-- commits locais;
-- patch ou bundle;
-- corpo do PR;
-- comandos exatos de retomada.
-
-Não declarar PR criado sem URL e número confirmados. Falta de autenticação ou
-acesso bloqueia apenas as etapas remotas; não revoga a autorização para branch,
-validação e commit locais.
+Se GitHub/autenticação estiver indisponível: `status: BLOCKED_GITHUB`; gerar branch/commit local quando tecnicamente possível, patch/bundle, corpo do PR e comandos de retomada. Não declarar PR criado sem URL/número confirmados.
 
 ## Merge
 
-O agente não faz merge. A decisão e a execução do merge são exclusivamente humanas.
-
-## CI mínimo recomendado
-
-- markdown lint;
-- verificação de links e referências;
-- detecção de arquivos duplicados por hash;
-- secret scan;
-- verificação de nomes proibidos;
-- validação de manifestos JSON;
-- teste dos scripts;
-- bloqueio de dumps e dados reais.
+O executor **não faz merge**. Decisão e execução do merge são exclusivamente humanas.
