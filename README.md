@@ -8,14 +8,15 @@ Repositório de governança, planejamento e código sob custódia da **Stein Age
 ## Estado atual verificado
 
 ```text
-last_verified_at: 2026-08-21T15:18:00-03:00
-verified_main: 918387376620f6985baeb14965c7245131114b49
+last_verified_at: 2026-09-26T08:55:00-03:00
+verified_main: 8131daedf471f4c34648f5c3a3be9973ad5d9cf2
 main: EXISTE
 ORG-001: MERGEADO via PR #1
 Issue #2: COMPLETED; objeto de governança REPROVADO para expansão de autonomia
-Issue #3: HUMAN GATE APROVADO; correção preparada em branch de sessão
+Issue #3: CLOSED / completed; PR #4 MERGED
+PR #4 merge: 8131daedf471f4c34648f5c3a3be9973ad5d9cf2
+PR #12: RECONCILIATION IN PROGRESS; merge exclusivamente humano
 DBTWIN-002: Gate 02-A NÃO APROVADO; Gate 02-B indisponível
-merge desta correção: NÃO AUTORIZADO automaticamente
 ```
 
 O bloco acima substitui como estado atual as declarações antigas `BLOCKED_BASE_BRANCH` / `main ausente`. A contagem `90 arquivos / 89 inventariados` pertence à baseline ORG-001 de 2026-08-02 e não deve ser tratada como contagem atual sem nova verificação.
@@ -61,8 +62,9 @@ AgentFactory/
 4. `docs/governance/PROVENANCE_STANDARD.md`
 5. `docs/governance/MISSION_MANIFEST_STANDARD.md`
 6. `docs/governance/AGENT_ROUTING_HEURISTIC.md`
-7. M17/M18 e decisões `current/`
-8. somente então o pacote da missão relevante
+7. `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md` — contrato persistente do executor
+8. M17/M18 e decisões `current/`
+9. somente então o pacote da missão relevante
 
 ## DBTWIN-002 — estado preservado
 
