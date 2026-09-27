@@ -1,0 +1,8 @@
+{"at": "2026-09-27T15:54:31.184347Z", "stage": "mission_intake", "status": "PASS", "mission_id": "FACTORY-FOM-001-REF-001"}
+{"at": "2026-09-27T15:54:31.184366Z", "stage": "current_state_bootstrap", "status": "PASS", "base_ref": "main", "base_sha": "758478192a79728a653736e48fa35078cce0d6f4"}
+{"at": "2026-09-27T15:54:31.184372Z", "stage": "capability_routing", "status": "PASS", "requested_executor": "AUTO", "actual_executor": "builtin:canonical-json-sha256"}
+{"at": "2026-09-27T15:54:31.184597Z", "stage": "executor_tool_use", "status": "PASS", "executor": "builtin:canonical-json-sha256", "operation": "canonical_json_sha256", "input_ref": "docs/missions/FACTORY-FOM-001/fixtures/synthetic_payload.json", "input_file_sha256": "c85a4ab70f4dbca85e67a91b19c3906e8e9d42a0b8c98736c88bb2835d397e01", "output_sha256": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2"}
+{"at": "2026-09-27T15:54:31.184604Z", "stage": "verification", "status": "PASS", "expected": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2", "actual": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2", "human_gate": "NOT_TRIGGERED_P0_P1_SYNTHETIC"}
+{"at": "2026-09-27T15:54:31.184763Z", "stage": "trace_evidence", "status": "PASS", "output_staging": ".fom-bac732f1891f1dc09ce7.tmp-x82z7gjk"}
+{"at": "2026-09-27T15:54:31.184770Z", "stage": "artifact_result", "status": "PASS", "artifact": "result.json"}
+{"at": "2026-09-27T15:54:31.184773Z", "stage": "handoff_session_close", "status": "PASS", "next_gate": "HUMAN_REVIEW_OF_BRANCH_PR", "does_not_prove": ["generic tool registry implemented", "production safety", "DB Twin operational", "browser smoke testing", "capability router beyond the built-in reference executor"]}
