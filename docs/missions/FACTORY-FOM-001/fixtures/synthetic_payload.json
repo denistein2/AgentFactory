@@ -1,0 +1,11 @@
+{
+  "mission": "synthetic-canonical-json-hash",
+  "items": [
+    {"id": "B", "qty": 2},
+    {"id": "A", "qty": 1}
+  ],
+  "metadata": {
+    "synthetic": true,
+    "contains_real_data": false
+  }
+}
