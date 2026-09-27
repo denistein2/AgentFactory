@@ -1,0 +1,35 @@
+{
+  "contract_version": "0.1.0",
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "issue": 5,
+  "base_ref": "main",
+  "base_sha": "758478192a79728a653736e48fa35078cce0d6f4",
+  "requested_executor": "AUTO",
+  "capabilities_required": [
+    "canonicalize_json",
+    "sha256"
+  ],
+  "sources_required": [
+    "docs/missions/FACTORY-FOM-001/fixtures/synthetic_payload.json"
+  ],
+  "risk_level": "LOW",
+  "reversibility": "FULL",
+  "permissions_allowed": [
+    "READ_REPO_FIXTURE",
+    "WRITE_EVIDENCE_LOCAL"
+  ],
+  "permissions_denied": [
+    "NETWORK",
+    "LIVE_DB",
+    "LIVE_DB_WRITE",
+    "PRODUCTION",
+    "SECRETS",
+    "DEPLOY",
+    "MERGE",
+    "DESTRUCTIVE"
+  ],
+  "human_gate": "NOT_REQUIRED_FOR_SYNTHETIC_LOCAL_RUN",
+  "input_path": "docs/missions/FACTORY-FOM-001/fixtures/synthetic_payload.json",
+  "expected_output_sha256": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2",
+  "idempotency_key": "FACTORY-FOM-001-REF-001:v1"
+}
