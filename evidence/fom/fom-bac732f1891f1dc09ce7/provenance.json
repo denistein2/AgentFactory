@@ -1,0 +1,22 @@
+{
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "run_id": "fom-bac732f1891f1dc09ce7",
+  "base_main_sha": "758478192a79728a653736e48fa35078cce0d6f4",
+  "execution_material": {
+    "runner_path": "tools/fom/run_fom_v0.py",
+    "runner_git_blob_sha": "9ef0d90315af8d23add24b88530d90932687c2c2",
+    "runner_file_sha256": "37595042a40a37a21fb545b278e2d3d797248834d79625bdbb456580cd94e15f",
+    "test_path": "tools/fom/test_fom_v0.py",
+    "test_git_blob_sha": "c5b2245ec6d0eb78efcbbee3c0a652107a634387",
+    "test_file_sha256": "a211818bb08840936099cdc8e9ba0bee4fa00c072bc821b44ec23e6648914934",
+    "mission_contract_git_blob_sha": "a81aa91aabce5864b6d60305bdcedcfe0ff6a891",
+    "fixture_git_blob_sha": "99febd4e52ea8f303a5bb25ed44e70d6e6c61c9b"
+  },
+  "verification": "Local execution files matched the Git blob identities later persisted on the mission branch.",
+  "evidence_strength": "EXECUTION_REPRODUCED",
+  "does_not_prove": [
+    "GitHub-hosted FOM unit-test execution",
+    "production readiness",
+    "DB Twin readiness"
+  ]
+}
