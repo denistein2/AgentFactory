@@ -1,0 +1,11 @@
+{
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "run_id": "fom-bac732f1891f1dc09ce7",
+  "operation": "canonical_json_sha256",
+  "input_ref": "docs/missions/FACTORY-FOM-001/fixtures/synthetic_payload.json",
+  "input_file_sha256": "c85a4ab70f4dbca85e67a91b19c3906e8e9d42a0b8c98736c88bb2835d397e01",
+  "canonical_json": "{\"items\":[{\"id\":\"B\",\"qty\":2},{\"id\":\"A\",\"qty\":1}],\"metadata\":{\"contains_real_data\":false,\"synthetic\":true},\"mission\":\"synthetic-canonical-json-hash\"}",
+  "result_sha256": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2",
+  "expected_output_sha256": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2",
+  "verified": true
+}
