@@ -6,25 +6,29 @@
 ## Snapshot externo revalidado
 
 ```yaml
-last_verified_at: 2026-09-26T08:55:00-03:00
+last_verified_at: 2026-09-27T08:48:00-03:00
 verified_ref: main
-verified_sha: 8131daedf471f4c34648f5c3a3be9973ad5d9cf2
+verified_sha: e5ac0c0a8c84583b072b25df6c553189fdda782d
 observer: ChatGPT / OpenAI / GPT-5.6 Sol
 verifier: GitHub connector live readback
 issue_3: CLOSED
 pr_4: MERGED
-pr_12: OPEN_RECONCILIATION
+pr_12: MERGED
+agentspec: CURRENT_IN_MAIN
+next_doc_sync: issue_11
+next_runtime_axis: issue_5
 ```
-
-> O SHA acima é a baseline viva observada **antes do merge eventual da PR #12**. Se este arquivo for lido em uma ref posterior, a própria ref Git observada prevalece e este snapshot vira baseline histórica até novo readback.
 
 ### Estado
 
-- `main` observada em `8131daedf471f4c34648f5c3a3be9973ad5d9cf2`.
-- PR #4 foi mergeada em 2026-09-26; a governança do reset está presente em `main`.
-- Issue #3 (`GOVERNANCE-RESET-FACTORY-001`) está `CLOSED / completed`.
-- PR #12 (`AgentSpec`) está em reconciliação contra a main pós-PR #4; merge permanece exclusivamente humano.
-- DBTWIN-002 continua `Gate 02-A NÃO APROVADO`; a reconciliação de AgentSpec não inicia Fase 02 nem runtime.
+- `main` observada em `e5ac0c0a8c84583b072b25df6c553189fdda782d`.
+- PR #4 mergeada; Issue #3 encerrada.
+- PR #12 mergeada em 2026-09-27; AgentSpec agora existe em `main`.
+- Issue #11 vira sincronização documental mínima de current-state/roadmap.
+- Issue #5 vira o próximo eixo de produto/runtime: definir e provar o FOM.
+- Schema Context Pack V0 permanece `WORKING_DRAFT` e é componente candidato do bootstrap/contexto do FOM.
+- DBTWIN-002 continua com Gate 02-A não aprovado; nenhum twin/container foi executado por este sync.
+
 
 ## Resolução de current-state
 
@@ -72,6 +76,22 @@ PR #4 mergeada por Human Gate. `main` observada em `8131daedf471f4c34648f5c3a3be
 
 ### 2026-09-26 — reconciliação PR #12
 A branch AgentSpec é preservada antes da reconciliação e reaplicada sobre a main pós-PR #4. A reconciliação deve preservar current-state/provenance/routing/lifecycle e corrigir a transição AGASALHO → AgentSpec sem alegar implementação de runtime.
+
+### 2026-09-27 — merge PR #12 / AgentSpec em main
+PR #12 mergeada por Human Gate. `main` observada em `e5ac0c0a8c84583b072b25df6c553189fdda782d`. AgentSpec deixa de ser candidato e passa a contrato vigente em `main`.
+
+### 2026-09-27 — retorno ao produto / FOM
+Decisão humana: a Agent Factory deve reduzir o ciclo de desenvolvimento e executar trabalho repetitivo com segurança, sem virar laboratório infinito.
+
+Direções:
+- banco vivo não é ambiente padrão de tentativa/erro;
+- DB Twin/ambiente efêmero é a direção de segurança para missões sensíveis a banco;
+- criar ambiente → executar → coletar evidência → destruir ambiente é o padrão desejado;
+- Schema Context Pack V0 serve o bootstrap/contexto do FOM;
+- Brain guarda significado e ponte; schema técnico real permanece em fonte viva;
+- produto de cliente é caso core de maturidade;
+- arqueologia local é higiene de fundação, não novo projeto;
+- LeadGen/Laia ficam fora do foco imediato.
 
 ## Regra de atualização
 
