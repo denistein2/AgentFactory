@@ -1,0 +1,28 @@
+{
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "run_id": "fom-bac732f1891f1dc09ce7",
+  "base_main_sha": "758478192a79728a653736e48fa35078cce0d6f4",
+  "execution_material": {
+    "runner_path": "tools/fom/run_fom_v0.py",
+    "runner_git_blob_sha": "f4aff2f98ae81533b58fb3cf7b9eef5523bbf1eb",
+    "runner_file_sha256": "5a5d294345aea2ac23ff183881c76f009e4702d4ed24ecd85b63e468f68402a4",
+    "test_path": "tools/fom/test_fom_v0.py",
+    "test_git_blob_sha": "a243db471d73ec4510040a58479d2b450c651633",
+    "test_file_sha256": "57e61549c818abaa3c08e50ab5fdfdb9402077b953f93786db5c3901f638e857",
+    "mission_contract_git_blob_sha": "a81aa91aabce5864b6d60305bdcedcfe0ff6a891",
+    "fixture_git_blob_sha": "99febd4e52ea8f303a5bb25ed44e70d6e6c61c9b"
+  },
+  "local_validation": {
+    "unit_tests": "6/6 PASS",
+    "controlled_failure_final_side_effects": 0,
+    "successful_run": true,
+    "idempotent_replay": true
+  },
+  "verification": "Final local execution used bytes matching the Git blob identities persisted on the mission branch.",
+  "evidence_strength": "EXECUTION_REPRODUCED",
+  "does_not_prove": [
+    "GitHub-hosted FOM unit-test execution",
+    "production readiness",
+    "DB Twin readiness"
+  ]
+}

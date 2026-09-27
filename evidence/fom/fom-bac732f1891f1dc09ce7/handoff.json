@@ -1,0 +1,14 @@
+{
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "run_id": "fom-bac732f1891f1dc09ce7",
+  "status": "SUCCESS",
+  "verdict": "REFERENCE_MISSION_E2E_REPRODUCED",
+  "next_human_gate": "REVIEW_AND_MERGE_\u004fNLY",
+  "does_not_prove": [
+    "generic tool registry implemented",
+    "production safety",
+    "DB Twin operational",
+    "browser smoke testing",
+    "capability router beyond the built-in reference executor"
+  ]
+}
