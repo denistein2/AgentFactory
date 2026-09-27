@@ -83,7 +83,7 @@ Synthetic/reversible mission:
 
 Unit tests:
 
-`4/4 PASS`
+`6/6 PASS`
 
 Covered:
 - success + idempotent replay;
@@ -111,7 +111,7 @@ Second identical run:
 
 ## 7. Evidence Pack
 
-Committed evidence is under:
+Recoverable evidence is persisted under:
 
 `evidence/fom/fom-bac732f1891f1dc09ce7/`
 
