@@ -34,9 +34,34 @@ Regra crítica: **um documento não prova que continua atual apenas porque seu c
 - `docs/governance/AGENT_ROUTING_HEURISTIC.md` — seleção por capacidade/risco/reversibilidade antes de provider/modelo.
 - `docs/governance/FACTORY_LOGBOOK.md` — timeline + índice de current-state.
 
-Esses padrões foram preparados por `GOVERNANCE-RESET-FACTORY-001`; tornam-se governança da `main` somente após merge humano do PR correspondente.
+Esses padrões foram incorporados à `main` pela PR #4 (`GOVERNANCE-RESET-FACTORY-001`) em 2026-09-26. Mudanças posteriores continuam sujeitas aos Gates aplicáveis.
 
-## 4. Princípios permanentes
+## 4. AgentSpec — contrato persistente do executor
+
+Quando esta versão estiver presente em `main`, **AGENTSPEC-001** governa a especificação persistente de identidade, capacidades, superfícies, permissões P0–P4, calibração, writes escopados e Human Gates do executor:
+
+- `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md`;
+- `templates/AGENTSPEC_TEMPLATE.md`.
+
+### Regra de transição
+
+- agentes/executores novos precisam de AgentSpec compatível antes da primeira missão material;
+- executores já existentes **não ficam globalmente bloqueados retroativamente** apenas porque missões históricas ocorreram antes da adoção do protocolo;
+- no próximo uso material de um executor existente, ou após mudança relevante de runtime/tooling/permissões, criar ou revalidar a AgentSpec antes do dispatch;
+- observação P0 e calibração estritamente necessárias para construir/revalidar a AgentSpec podem ocorrer sob a governança vigente; isso não equivale a missão material de produto;
+- missões históricas encerradas não são reabertas somente para produzir AgentSpec retroativa.
+
+Somente `AGENT_READY` ou `AGENT_READY_WITH_SCOPED_ALLOWLIST` liberam uma missão material governada pelo protocolo.
+
+### Does not prove
+
+A presença de uma AgentSpec:
+- não prova capability real sem evidência/calibração;
+- não concede permissões além da Mission e da governança;
+- não satisfaz por si só o DoD executável da Issue #8 nem substitui contratos/runtime de ferramentas;
+- não autoriza merge, deploy, banco vivo, secrets ou outra consequência P3.
+
+## 5. Princípios permanentes
 
 1. `coerência documental ≠ reprodução de execução ≠ auditoria de código`.
 2. Preservar antes de limpar.
@@ -49,21 +74,22 @@ Esses padrões foram preparados por `GOVERNANCE-RESET-FACTORY-001`; tornam-se go
 9. `UNKNOWN`/`UNVERIFIED` é preferível a inferir identidade, modelo, horário ou estado.
 10. Issue/mission contract pode **restringir** permissões herdadas; não ampliá-las silenciosamente.
 
-## 5. DBTWIN-002
+## 6. DBTWIN-002
 
 - Gate 02-A — preparação estática, não aprovado.
 - Gate 02-B — execução/container, indisponível até 02-A e pré-condições.
 - Esta governança não autoriza Docker, Supabase, HOMOLOG, produção ou dado real.
 
-## 6. Protocolos
+## 7. Protocolos
 
+- `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md` — contrato persistente do executor; readiness depende de evidência/calibração.
 - `docs/governance/PROTOCOLO_EXCHANGE_01.md` — transferência Drive↔Local sintética.
 - `docs/governance/PROTOCOLO_CROSSAUDIT_01.md` — dupla construção/auditoria cruzada; caro e não padrão.
 - `SESSION_CLOSE_PROTOCOL.md` — fechamento de sessão e Draft PR.
 
 Protocolos específicos podem nomear produtos/agentes para um experimento, mas não substituem a heurística genérica de routing.
 
-## 7. Fronteira Git
+## 8. Fronteira Git
 
 Sessão que altera o projeto usa branch de sessão, validação, commit/push da branch e Draft PR. Push direto em `main` é proibido. **Merge é exclusivamente humano.**
 
