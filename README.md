@@ -8,15 +8,16 @@ Repositório de governança, planejamento e código sob custódia da **Stein Age
 ## Estado atual verificado
 
 ```text
-last_verified_at: 2026-09-26T08:55:00-03:00
-verified_main: 8131daedf471f4c34648f5c3a3be9973ad5d9cf2
+last_verified_at: 2026-09-27T08:48:00-03:00
+verified_main: e5ac0c0a8c84583b072b25df6c553189fdda782d
 main: EXISTE
-ORG-001: MERGEADO via PR #1
-Issue #2: COMPLETED; objeto de governança REPROVADO para expansão de autonomia
 Issue #3: CLOSED / completed; PR #4 MERGED
-PR #4 merge: 8131daedf471f4c34648f5c3a3be9973ad5d9cf2
-PR #12: RECONCILIATION IN PROGRESS; merge exclusivamente humano
-DBTWIN-002: Gate 02-A NÃO APROVADO; Gate 02-B indisponível
+PR #12: MERGED; AgentSpec presente em main
+AgentSpec: CANÔNICA EM MAIN
+Issue #11: próxima sincronização documental mínima
+Issue #5: próximo eixo de produto/runtime — FOM
+Schema Context Pack V0: WORKING_DRAFT; componente candidato do bootstrap/contexto do FOM
+DBTWIN-002: Gate 02-A NÃO APROVADO; execução não iniciada
 ```
 
 O bloco acima substitui como estado atual as declarações antigas `BLOCKED_BASE_BRANCH` / `main ausente`. A contagem `90 arquivos / 89 inventariados` pertence à baseline ORG-001 de 2026-08-02 e não deve ser tratada como contagem atual sem nova verificação.
@@ -65,6 +66,17 @@ AgentFactory/
 7. `docs/governance/AGENTSPEC_001_AGENT_SPECIFICATION_PROTOCOL.md` — contrato persistente do executor
 8. M17/M18 e decisões `current/`
 9. somente então o pacote da missão relevante
+
+## Próximo caminho operacional
+
+```text
+#11 current-state sync mínimo
+→ #5 FOM
+→ primeira missão sintética/reversível E2E
+→ puxar #6–#10 conforme gargalo comprovado
+```
+
+Princípio anti-Hydra: Schema Context Pack, DB Twin, evals, tracing, tool contracts, durable context e routing entram quando habilitam uma etapa necessária do FOM; não viram frentes paralelas só por interesse técnico.
 
 ## DBTWIN-002 — estado preservado
 
