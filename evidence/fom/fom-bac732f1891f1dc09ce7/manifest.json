@@ -1,0 +1,23 @@
+{
+  "fom_version": "0.1.0",
+  "mission_id": "FACTORY-FOM-001-REF-001",
+  "issue": 5,
+  "run_id": "fom-bac732f1891f1dc09ce7",
+  "base_ref": "main",
+  "base_sha": "758478192a79728a653736e48fa35078cce0d6f4",
+  "requested_executor": "AUTO",
+  "actual_executor": "builtin:canonical-json-sha256",
+  "risk_level": "LOW",
+  "reversibility": "FULL",
+  "permissions_allowed": ["READ_REPO_FIXTURE", "WRITE_EVIDENCE_LOCAL"],
+  "permissions_denied": ["NETWORK", "LIVE_DB", "LIVE_DB_WRITE", "PRODUCTION", "SECRETS", "DEPLOY", "MERGE", "DESTRUCTIVE"],
+  "started_at": "2026-09-27T15:54:31.184347Z",
+  "evidence_strength": "EXECUTION_REPRODUCED",
+  "does_not_prove": [
+    "generic tool registry implemented",
+    "production safety",
+    "DB Twin operational",
+    "browser smoke testing",
+    "capability router beyond the built-in reference executor"
+  ]
+}
