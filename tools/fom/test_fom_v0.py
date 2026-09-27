@@ -96,5 +96,27 @@ class FomV0Tests(unittest.TestCase):
                 fom.run_fom(mission_path, root, root / "evidence", "deadbeef")
             self.assertIn("STALE_BASE_SHA", str(ctx.exception))
 
+    def test_incomplete_evidence_pack_stops(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, _ = self.make_fixture(root)
+            output = root / "evidence"
+            first = fom.run_fom(mission_path, root, output, BASE_SHA)
+            self.assertEqual(first["status"], "SUCCESS")
+            (Path(first["output_dir"]) / "result.json").unlink()
+            with self.assertRaises(fom.FomStop) as ctx:
+                fom.run_fom(mission_path, root, output, BASE_SHA)
+            self.assertIn("INCOMPLETE_EVIDENCE_PACK", str(ctx.exception))
+
+    def test_undeclared_source_stops(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, mission = self.make_fixture(root)
+            mission["sources_required"] = []
+            mission_path.write_text(json.dumps(mission), encoding="utf-8")
+            with self.assertRaises(fom.FomStop) as ctx:
+                fom.run_fom(mission_path, root, root / "evidence", BASE_SHA)
+            self.assertIn("INPUT_NOT_DECLARED_AS_REQUIRED_SOURCE", str(ctx.exception))
+
 if __name__ == "__main__":
     unittest.main()
