@@ -86,6 +86,15 @@ def validate_mission(mission: Dict[str, Any], observed_base_sha: str) -> None:
     if mission["issue"] != 5:
         raise FomStop("MISSION_OUT_OF_SCOPE_ISSUE")
 
+    if mission["base_ref"] != "main":
+        raise FomStop("REFERENCE_MISSION_BASE_REF_NOT_MAIN")
+
+    if mission["reversibility"] != "FULL":
+        raise FomStop("REFERENCE_MISSION_NOT_FULLY_REVERSIBLE")
+
+    if mission["input_path"] not in mission["sources_required"]:
+        raise FomStop("INPUT_NOT_DECLARED_AS_REQUIRED_SOURCE")
+
     if mission["base_sha"] != observed_base_sha:
         raise FomStop(
             f"STALE_BASE_SHA:mission={mission['base_sha']}:observed={observed_base_sha}"
@@ -230,12 +239,32 @@ def run_fom(
     summary_path = final_dir / "run_summary.json"
 
     if summary_path.is_file():
+        required_evidence = {
+            "manifest.json",
+            "trace.jsonl",
+            "result.json",
+            "handoff.json",
+            "run_summary.json",
+        }
+        missing_evidence = sorted(
+            name for name in required_evidence if not (final_dir / name).is_file()
+        )
+        if missing_evidence:
+            raise FomStop(
+                "INCOMPLETE_EVIDENCE_PACK:" + ",".join(missing_evidence)
+            )
+
         existing = load_json(summary_path)
+        existing_result = load_json(final_dir / "result.json")
+        existing_manifest = load_json(final_dir / "manifest.json")
         if (
             existing.get("mission_id") == mission["mission_id"]
             and existing.get("input_file_sha256") == input_file_hash
             and existing.get("result_sha256") == output_hash
             and existing.get("status") == "SUCCESS"
+            and existing_result.get("run_id") == run_id
+            and existing_result.get("verified") is True
+            and existing_manifest.get("run_id") == run_id
         ):
             return {
                 "status": "IDEMPOTENT_REPLAY",
