@@ -1,16 +1,16 @@
 # FOM-001 — Fluxo Operacional Mínimo da Stein Agent Factory
 
-> Status nesta branch: CANDIDATE
+> Status: CURRENT_IN_MAIN / HARDENING 0.1.1
 > Issue dona: #5 — FACTORY-FOM-001
 > Human Gate owner: Denis Stein
 
 ## 1. Definição
 
-Para a Agent Factory, **FOM** passa a significar, nesta proposta, **Fluxo Operacional Mínimo**.
-
-A expansão é proposta porque a própria Issue #5 já registra o uso histórico de FOM como “fluxo operacional mínimo/core”. Ela só se torna canônica após merge humano desta branch.
+Para a Agent Factory, **FOM** significa **Fluxo Operacional Mínimo**.
 
 O FOM é o menor circuito executável capaz de receber uma Mission, reconstruir current-state suficiente, selecionar um executor elegível, executar uma ação permitida, gerar evidence/provenance, verificar o resultado, respeitar Gates e encerrar com artifact + handoff recuperáveis.
+
+A versão 0.1.0 foi promovida a `main` via PR #15. A versão 0.1.1 é o hardening A+D posterior à auditoria adversarial.
 
 ## 2. Fluxo mínimo
 
@@ -30,42 +30,53 @@ Mission Intake
 | Etapa | Entrada mínima | Saída mínima | STOP |
 |---|---|---|---|
 | Mission Intake | manifest versionado | Mission validada | campo obrigatório ausente / escopo incorreto |
-| Current-State Bootstrap | base_ref + base_sha observado | contexto com ref explícita | SHA stale/divergente |
-| Capability Routing | capabilities + permissions | executor elegível | nenhum executor elegível |
+| Current-State Bootstrap | base_ref + base_sha declarado | ref resolvida pelo próprio Git | SHA stale/divergente / ref não resolvida |
+| Capability Routing | capabilities + permissions | executor elegível | nenhum executor elegível / permissão usada não autorizada |
 | Executor / Tool Use | fixture sintética + executor | resultado determinístico | surface/permissão não autorizada |
-| Trace + Evidence | eventos materiais | trace + manifest | falha de persistência |
+| Trace + Evidence | eventos materiais | trace + manifest + provenance | falha de persistência / material não corresponde a HEAD |
 | Verification / Gate | expected outcome + risk | PASS/STOP/GATE | mismatch ou P3 |
-| Artifact / Result | resultado verificado | artifact recuperável | conflito de idempotência |
+| Artifact / Result | resultado verificado | artifact recuperável | conflito/integridade de idempotência |
 | Handoff / Session Close | evidence pack | summary + next gate | evidência incompleta |
 
 ## 4. Reference Mission V0
 
-A primeira missão é propositalmente pequena e sem produção:
+A missão é pequena, sintética e sem produção:
 
-- lê um JSON sintético versionado;
+- lê JSON sintético versionado;
 - canonicaliza o JSON;
 - calcula SHA-256;
 - compara com hash esperado;
-- roteia somente para um executor built-in com capabilities explícitas;
-- grava evidence local de forma atômica;
-- recusa permissões de rede, banco vivo, produção, secrets, deploy, merge e destruição.
+- roteia somente para executor built-in com capabilities explícitas;
+- exige permissões realmente usadas;
+- grava evidence somente sob a superfície `repo/evidence`;
+- persiste provenance do runtime/mission/fixture;
+- recusa rede, banco vivo, produção, secrets, deploy, merge e destruição.
 
 Isso prova o **circuito**, não a utilidade de negócio do ERP.
 
-## 5. Retry e idempotência
+## 5. Current-state
+
+O caller não fornece SHA observado como autoridade.
+
+O runner resolve `main` diretamente do Git, preferindo `origin/main` quando disponível, e compara a resolução com `mission.base_sha`.
+
+Se a main andar após a criação da Mission, a execução produz `STALE_BASE_SHA`.
+
+## 6. Retry, idempotência e integridade
 
 O `run_id` é determinístico por:
 
 `mission_id + idempotency_key + base_sha + input_hash + FOM_VERSION`.
 
 A publicação do evidence pack é atômica:
-- artefatos são escritos em diretório temporário;
+- artefatos são escritos em staging temporário;
 - falha antes do commit remove o staging;
-- só depois ocorre rename atômico para o diretório final;
-- replay com mesma identidade retorna `IDEMPOTENT_REPLAY`;
-- saída existente conflitante causa `STOP`.
+- rename atômico publica o diretório final;
+- replay com mesma identidade só retorna `IDEMPOTENT_REPLAY` se o pack estiver completo e íntegro;
+- hashes de `manifest`, `trace`, `result`, `handoff` e `provenance` são verificados;
+- saída ausente, incompleta, alterada ou conflitante causa `STOP`.
 
-## 6. Gate
+## 7. Gate
 
 A Reference Mission é LOW risk, sintética e reversível. Não requer Human Gate durante o run.
 
@@ -78,9 +89,7 @@ Human Gate permanece obrigatório para:
 - destruição real;
 - ampliação canônica de autoridade.
 
-O merge desta proposta é o Gate que promove FOM-001 a canônico.
-
-## 7. Evidence Pack mínimo
+## 8. Evidence Pack mínimo
 
 Cada run produz:
 
@@ -88,37 +97,52 @@ Cada run produz:
 - `trace.jsonl`
 - `result.json`
 - `handoff.json`
+- `provenance.json`
 - `run_summary.json`
 
-Campos materiais incluem `mission_id`, `run_id`, executor solicitado/real, base SHA, timestamps, permissions, hashes, verdict e `does_not_prove`.
+O runtime registra também a identidade Git/arquivo do runner, Mission e fixture usados na execução.
 
-## 8. FOM CLOSED — Definition of Done
+## 9. CI dedicado
+
+`.github/workflows/fom-v0.yml` executa:
+- suite unitária do FOM;
+- Reference Mission;
+- replay idempotente;
+- upload do evidence pack como artifact.
+
+O CI usa checkout com histórico suficiente para resolver a `main` pelo próprio Git.
+
+## 10. FOM CLOSED — Definition of Done
 
 FOM pode ser declarado CLOSED somente quando:
 
 - FOM está versionado em main;
-- a Reference Mission executa intake → close;
-- o run é reproduzível;
-- replay idempotente não duplica efeito;
+- Reference Mission executa intake → close;
+- current-state é observado pelo runtime, não injetado pelo caller;
+- run é reproduzível;
+- replay idempotente não duplica efeito e detecta tamper;
 - falha controlada não deixa side effect final;
 - stale base produz STOP;
-- permissão proibida produz STOP;
+- permissão proibida ou necessária ausente produz STOP;
+- output root fora de `repo/evidence` produz STOP;
+- runtime produz provenance da execução;
+- GitHub-hosted FOM CI executa suite + Reference Mission;
 - evidence pack permite reconstrução sem transcript privado;
 - merge continua Human Gate;
 - documentação diferencia FOM de pós-FOM.
 
-## 9. Pós-FOM
+## 11. Pós-FOM
 
 Issues #6–#10 não entram automaticamente.
 
-Elas são puxadas quando um gargalo comprovado exigir:
+Elas são puxadas somente quando um gargalo comprovado exigir:
 - #6 eval harness;
 - #7 trace/evidence runtime mais amplo;
 - #8 generic tool contracts;
 - #9 durable context/resume;
 - #10 capability router baseado em evidência.
 
-## 10. Does not prove
+## 12. Does not prove
 
 Este FOM V0 não prova:
 - tool registry genérico;

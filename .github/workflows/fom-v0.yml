@@ -1,0 +1,56 @@
+name: fom-v0
+
+on:
+  push:
+    branches:
+      - 'hardening/**'
+    paths:
+      - 'tools/fom/**'
+      - 'docs/missions/FACTORY-FOM-001/**'
+      - 'docs/governance/FOM_001_FLUXO_OPERACIONAL_MINIMO.md'
+      - '.github/workflows/fom-v0.yml'
+  pull_request:
+    paths:
+      - 'tools/fom/**'
+      - 'docs/missions/FACTORY-FOM-001/**'
+      - 'docs/governance/FOM_001_FLUXO_OPERACIONAL_MINIMO.md'
+      - '.github/workflows/fom-v0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hardened-reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Unit tests
+        run: python -m unittest tools/fom/test_fom_v0.py -v
+
+      - name: Reference mission
+        run: |
+          rm -rf evidence/fom-ci
+          python tools/fom/run_fom_v0.py \
+            --mission docs/missions/FACTORY-FOM-001/MISSION_REFERENCE_SYNTHETIC.json \
+            --repo-root . \
+            --output-root evidence/fom-ci
+
+      - name: Replay must be idempotent
+        run: |
+          python tools/fom/run_fom_v0.py \
+            --mission docs/missions/FACTORY-FOM-001/MISSION_REFERENCE_SYNTHETIC.json \
+            --repo-root . \
+            --output-root evidence/fom-ci | tee /tmp/fom-replay.json
+          grep -q '"status": "IDEMPOTENT_REPLAY"' /tmp/fom-replay.json
+
+      - name: Upload FOM evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fom-v0-evidence
+          path: evidence/fom-ci/
+          if-no-files-found: error
+          retention-days: 14
