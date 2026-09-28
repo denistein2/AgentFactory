@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from uuid import uuid4
 
 HERE = Path(__file__).resolve()
 MODULE_PATH = HERE.parent / "run_fom_v0.py"
@@ -53,6 +54,7 @@ class FomV0HardeningTests(unittest.TestCase):
             "issue": 5,
             "base_ref": "main",
             "base_sha": base_sha,
+            "base_sha_policy": "PINNED",
             "requested_executor": "AUTO",
             "capabilities_required": ["canonicalize_json", "sha256"],
             "sources_required": [
@@ -78,14 +80,20 @@ class FomV0HardeningTests(unittest.TestCase):
         mission_path.write_text(json.dumps(mission, indent=2) + "\n", encoding="utf-8")
         self.git(root, "add", ".")
         self.git(root, "commit", "-qm", "feature runner and mission")
-        return mission_path, mission, runner_copy
+        return mission_path, mission, runner_copy, self.load_runtime(runner_copy)
 
-    def run_fom(self, mission_path, root, runner_copy, **kwargs):
-        return fom.run_fom(
+    def load_runtime(self, runner_copy):
+        spec = importlib.util.spec_from_file_location("fom_runtime_" + uuid4().hex, runner_copy)
+        runtime = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(runtime)
+        return runtime
+
+    def run_fom(self, runtime, mission_path, root, **kwargs):
+        return runtime.run_fom(
             mission_path=mission_path,
             repo_root=root,
             output_root=kwargs.pop("output_root", Path("evidence/test-fom")),
-            runner_path=runner_copy,
             **kwargs,
         )
 
@@ -97,45 +105,126 @@ class FomV0HardeningTests(unittest.TestCase):
     def test_success_and_idempotent_replay(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            first = self.run_fom(mission_path, root, runner_copy)
-            second = self.run_fom(mission_path, root, runner_copy)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
+            second = self.run_fom(runtime, mission_path, root)
             self.assertEqual(first["status"], "SUCCESS")
             self.assertEqual(second["status"], "IDEMPOTENT_REPLAY")
             self.assertEqual(first["run_id"], second["run_id"])
 
+    def test_changed_runner_material_does_not_reuse_old_replay(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
+            runner_copy.write_text(runner_copy.read_text(encoding="utf-8") + "\n# changed\n", encoding="utf-8")
+            self.git(root, "add", str(runner_copy.relative_to(root)))
+            self.git(root, "commit", "-qm", "change runner material")
+            runtime = self.load_runtime(runner_copy)
+            second = self.run_fom(runtime, mission_path, root)
+            self.assertEqual(second["status"], "SUCCESS")
+            self.assertNotEqual(first["run_id"], second["run_id"])
+
+    def test_uncommitted_runner_material_stops_before_replay(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
+            runner_copy.write_text(runner_copy.read_text(encoding="utf-8") + "\n# uncommitted\n", encoding="utf-8")
+            changed_runtime = self.load_runtime(runner_copy)
+            with self.assertRaises(changed_runtime.FomStop) as ctx:
+                self.run_fom(changed_runtime, mission_path, root)
+            self.assertIn("EXECUTION_MATERIAL_DIFFERS_FROM_HEAD", str(ctx.exception))
+            self.assertNotEqual(first["status"], "IDEMPOTENT_REPLAY")
+
+    def test_changed_mission_material_does_not_reuse_old_replay(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
+            mission["review_note"] = "mission bytes changed"
+            self.commit_mission(root, mission_path, mission)
+            second = self.run_fom(runtime, mission_path, root)
+            self.assertEqual(second["status"], "SUCCESS")
+            self.assertNotEqual(first["run_id"], second["run_id"])
+
+    def test_changed_fixture_material_does_not_reuse_old_replay(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
+            fixture = root / mission["input_path"]
+            payload = json.loads(fixture.read_text(encoding="utf-8"))
+            payload["items"].append({"id": "C", "qty": 3})
+            fixture.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+            mission["expected_output_sha256"] = runtime.sha256_text(runtime.canonical_json(payload))
+            mission_path.write_text(json.dumps(mission, indent=2) + "\n", encoding="utf-8")
+            self.git(root, "add", ".")
+            self.git(root, "commit", "-qm", "change fixture and expected result")
+            runtime = self.load_runtime(runner_copy)
+            second = self.run_fom(runtime, mission_path, root)
+            self.assertEqual(second["status"], "SUCCESS")
+            self.assertNotEqual(first["run_id"], second["run_id"])
+
     def test_live_main_movement_stops_without_caller_override(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
             self.git(root, "checkout", "-q", "main")
             (root / "main-moved.txt").write_text("moved\n", encoding="utf-8")
             self.git(root, "add", "main-moved.txt")
             self.git(root, "commit", "-qm", "move main")
             self.git(root, "checkout", "-q", "feature")
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("STALE_BASE_SHA", str(ctx.exception))
+
+    def test_current_main_reference_verification_survives_main_advance(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
+            mission["base_sha_policy"] = "CURRENT_MAIN"
+            mission["base_sha"] = "CURRENT_MAIN"
+            self.commit_mission(root, mission_path, mission)
+            first = self.run_fom(runtime, mission_path, root)
+            self.git(root, "checkout", "-q", "main")
+            (root / "main-moved.txt").write_text("post-merge main\n", encoding="utf-8")
+            self.git(root, "add", "main-moved.txt")
+            self.git(root, "commit", "-qm", "advance main after merge")
+            self.git(root, "checkout", "-q", "feature")
+            second = self.run_fom(runtime, mission_path, root)
+            self.assertEqual(second["status"], "SUCCESS")
+            self.assertNotEqual(first["run_id"], second["run_id"])
+
+    def test_current_main_policy_requires_explicit_sentinel(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
+            mission["base_sha_policy"] = "CURRENT_MAIN"
+            self.commit_mission(root, mission_path, mission)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
+            self.assertIn("CURRENT_MAIN_BASE_POLICY_REQUIRES_EXPLICIT_SENTINEL", str(ctx.exception))
 
     def test_missing_write_permission_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, mission, runner_copy = self.setup_repo(root)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
             mission["permissions_allowed"].remove("WRITE_EVIDENCE_LOCAL")
             self.commit_mission(root, mission_path, mission)
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("MISSING_REQUIRED_REFERENCE_PERMISSION", str(ctx.exception))
 
     def test_output_root_escape_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            with self.assertRaises(fom.FomStop) as ctx:
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            with self.assertRaises(runtime.FomStop) as ctx:
                 self.run_fom(
+                    runtime,
                     mission_path,
                     root,
-                    runner_copy,
                     output_root=root / "outside-evidence",
                 )
             self.assertIn("OUTPUT_ROOT_OUTSIDE_REPO_EVIDENCE", str(ctx.exception))
@@ -143,36 +232,40 @@ class FomV0HardeningTests(unittest.TestCase):
     def test_trace_tamper_stops_replay(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            first = self.run_fom(mission_path, root, runner_copy)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
             trace = Path(first["output_dir"]) / "trace.jsonl"
             trace.write_text(trace.read_text(encoding="utf-8") + "{}\n", encoding="utf-8")
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("EVIDENCE_INTEGRITY_MISMATCH", str(ctx.exception))
 
     def test_handoff_tamper_stops_replay(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            first = self.run_fom(mission_path, root, runner_copy)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
             handoff_path = Path(first["output_dir"]) / "handoff.json"
             handoff = json.loads(handoff_path.read_text(encoding="utf-8"))
             handoff["status"] = "TAMPERED"
             handoff_path.write_text(json.dumps(handoff) + "\n", encoding="utf-8")
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("EVIDENCE_INTEGRITY_MISMATCH", str(ctx.exception))
 
     def test_runtime_emits_execution_material_provenance(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            first = self.run_fom(mission_path, root, runner_copy)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
             provenance = json.loads(
                 (Path(first["output_dir"]) / "provenance.json").read_text(encoding="utf-8")
             )
             self.assertTrue(provenance["generated_by_runtime"])
+            self.assertEqual(provenance["runtime_head_sha"], self.git(root, "rev-parse", "HEAD"))
+            self.assertEqual(provenance["base_sha_policy"], "PINNED")
+            self.assertEqual(provenance["declared_base_sha"], provenance["base_sha_observed"])
+            self.assertEqual(len(provenance["execution_material_fingerprint"]), 64)
             for key in ("runner", "mission", "fixture"):
                 entry = provenance["execution_material"][key]
                 self.assertEqual(len(entry["git_blob_sha"]), 40)
@@ -181,13 +274,13 @@ class FomV0HardeningTests(unittest.TestCase):
     def test_controlled_failure_leaves_no_final_side_effect(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
             output = root / "evidence/test-fom"
-            with self.assertRaises(fom.FomStop):
+            with self.assertRaises(runtime.FomStop):
                 self.run_fom(
+                    runtime,
                     mission_path,
                     root,
-                    runner_copy,
                     simulate_failure_before_commit=True,
                 )
             if output.exists():
@@ -197,31 +290,31 @@ class FomV0HardeningTests(unittest.TestCase):
     def test_forbidden_permission_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, mission, runner_copy = self.setup_repo(root)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
             mission["permissions_allowed"].append("LIVE_DB_WRITE")
             self.commit_mission(root, mission_path, mission)
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("FORBIDDEN_PERMISSION_REQUEST", str(ctx.exception))
 
     def test_undeclared_source_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, mission, runner_copy = self.setup_repo(root)
+            mission_path, mission, runner_copy, runtime = self.setup_repo(root)
             mission["sources_required"] = []
             self.commit_mission(root, mission_path, mission)
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("INPUT_NOT_DECLARED_AS_REQUIRED_SOURCE", str(ctx.exception))
 
     def test_incomplete_evidence_pack_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            mission_path, _, runner_copy = self.setup_repo(root)
-            first = self.run_fom(mission_path, root, runner_copy)
+            mission_path, _, runner_copy, runtime = self.setup_repo(root)
+            first = self.run_fom(runtime, mission_path, root)
             (Path(first["output_dir"]) / "result.json").unlink()
-            with self.assertRaises(fom.FomStop) as ctx:
-                self.run_fom(mission_path, root, runner_copy)
+            with self.assertRaises(runtime.FomStop) as ctx:
+                self.run_fom(runtime, mission_path, root)
             self.assertIn("INCOMPLETE_EVIDENCE_PACK", str(ctx.exception))
 
 

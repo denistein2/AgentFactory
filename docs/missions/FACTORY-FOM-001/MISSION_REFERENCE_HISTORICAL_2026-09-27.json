@@ -3,7 +3,7 @@
   "mission_id": "FACTORY-FOM-001-REF-001",
   "issue": 5,
   "base_ref": "main",
-  "base_sha": "CURRENT_MAIN",
+  "base_sha": "76a8e408de092163c61dfa6e7b8304a8dcedba0e",
   "requested_executor": "AUTO",
   "capabilities_required": [
     "canonicalize_json",
@@ -32,5 +32,5 @@
   "input_path": "docs/missions/FACTORY-FOM-001/fixtures/synthetic_payload.json",
   "expected_output_sha256": "dc5833c97d2d9c6172451bde78b37f95d0e2002e1b965e60f4e308710d38c0f2",
   "idempotency_key": "FACTORY-FOM-001-REF-001:v2",
-  "base_sha_policy": "CURRENT_MAIN"
+  "base_sha_policy": "PINNED"
 }

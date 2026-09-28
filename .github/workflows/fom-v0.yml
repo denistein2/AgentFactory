@@ -31,7 +31,7 @@ jobs:
       - name: Unit tests
         run: python -m unittest tools/fom/test_fom_v0.py -v
 
-      - name: Reference mission
+      - name: Reusable current-main reference verification
         run: |
           rm -rf evidence/fom-ci
           python tools/fom/run_fom_v0.py \

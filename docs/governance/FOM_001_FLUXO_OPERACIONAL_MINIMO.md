@@ -1,6 +1,6 @@
 # FOM-001 — Fluxo Operacional Mínimo da Stein Agent Factory
 
-> Status: CURRENT_IN_MAIN / HARDENING 0.1.1
+> Status: CURRENT_IN_MAIN / HARDENING 0.1.2
 > Issue dona: #5 — FACTORY-FOM-001
 > Human Gate owner: Denis Stein
 
@@ -10,7 +10,7 @@ Para a Agent Factory, **FOM** significa **Fluxo Operacional Mínimo**.
 
 O FOM é o menor circuito executável capaz de receber uma Mission, reconstruir current-state suficiente, selecionar um executor elegível, executar uma ação permitida, gerar evidence/provenance, verificar o resultado, respeitar Gates e encerrar com artifact + handoff recuperáveis.
 
-A versão 0.1.0 foi promovida a `main` via PR #15. A versão 0.1.1 é o hardening A+D posterior à auditoria adversarial.
+A versão 0.1.0 foi promovida a `main` via PR #15. A versão 0.1.1 foi o hardening A+D inicial; a versão 0.1.2 corrige identidade de replay e explicita as políticas de base.
 
 ## 2. Fluxo mínimo
 
@@ -30,7 +30,7 @@ Mission Intake
 | Etapa | Entrada mínima | Saída mínima | STOP |
 |---|---|---|---|
 | Mission Intake | manifest versionado | Mission validada | campo obrigatório ausente / escopo incorreto |
-| Current-State Bootstrap | base_ref + base_sha declarado | ref resolvida pelo próprio Git | SHA stale/divergente / ref não resolvida |
+| Current-State Bootstrap | base_ref + política e base declaradas | ref resolvida pelo Git local | SHA stale/divergente / ref não resolvida |
 | Capability Routing | capabilities + permissions | executor elegível | nenhum executor elegível / permissão usada não autorizada |
 | Executor / Tool Use | fixture sintética + executor | resultado determinístico | surface/permissão não autorizada |
 | Trace + Evidence | eventos materiais | trace + manifest + provenance | falha de persistência / material não corresponde a HEAD |
@@ -58,15 +58,17 @@ Isso prova o **circuito**, não a utilidade de negócio do ERP.
 
 O caller não fornece SHA observado como autoridade.
 
-O runner resolve `main` diretamente do Git, preferindo `origin/main` quando disponível, e compara a resolução com `mission.base_sha`.
+O runner resolve `main` no checkout local, preferindo `refs/remotes/origin/main`, depois `refs/heads/main`. Ele não faz fetch; caller/CI deve garantir que o remote ref esteja atualizado quando precisar de frescor remoto. A provenance registra esse SHA observado. Para `base_sha_policy: PINNED`, ele deve ser igual a `mission.base_sha` ou a execução para com `STALE_BASE_SHA`. Para `CURRENT_MAIN`, a Mission precisa declarar `base_sha: CURRENT_MAIN`; a resolução observada passa a ser a base de execução registrada.
 
-Se a main andar após a criação da Mission, a execução produz `STALE_BASE_SHA`.
+`MISSION_REFERENCE_HISTORICAL_2026-09-27.json` preserva o contrato histórico fixado em `76a8e408de092163c61dfa6e7b8304a8dcedba0e` e torna-se stale quando a base observada muda. `MISSION_REFERENCE_SYNTHETIC.json` é o self-test reutilizável; usa `CURRENT_MAIN` explicitamente para continuar válido após avanço de main. A política pinned continua exercitada na suite.
 
 ## 6. Retry, idempotência e integridade
 
 O `run_id` é determinístico por:
 
-`mission_id + idempotency_key + base_sha + input_hash + FOM_VERSION`.
+`mission_id + idempotency_key + base_policy + declared_base + observed_base + input_hash + runtime_head_sha + execution_material_fingerprint + FOM_VERSION`.
+
+O fingerprint cobre os blobs Git e hashes dos bytes do runner, Mission e fixture. Esses valores são calculados e comparados ao HEAD atual antes do replay. Portanto, replay só pode reutilizar a evidência da mesma identidade de execução material e do mesmo contexto Git observado.
 
 A publicação do evidence pack é atômica:
 - artefatos são escritos em staging temporário;
@@ -110,7 +112,7 @@ O runtime registra também a identidade Git/arquivo do runner, Mission e fixture
 - replay idempotente;
 - upload do evidence pack como artifact.
 
-O CI usa checkout com histórico suficiente para resolver a `main` pelo próprio Git.
+O CI usa checkout com histórico suficiente e remote ref para resolver a `main` pelo próprio Git, sem fetch dentro do runner. Executa a Mission reutilizável `CURRENT_MAIN`; a Mission histórica pinned não é usada como health check corrente.
 
 ## 10. FOM CLOSED — Definition of Done
 

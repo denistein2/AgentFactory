@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-FOM_VERSION = "0.1.1"
+FOM_VERSION = "0.1.2"
 
 BLOCKED_PERMISSION_TOKENS = {
     "NETWORK", "LIVE_DB", "LIVE_DB_WRITE", "PRODUCTION",
@@ -31,6 +31,7 @@ EXECUTORS = {
 
 REQUIRED_MISSION_FIELDS = {
     "contract_version", "mission_id", "issue", "base_ref", "base_sha",
+    "base_sha_policy",
     "requested_executor", "capabilities_required", "sources_required",
     "risk_level", "reversibility", "permissions_allowed", "permissions_denied",
     "human_gate", "input_path", "expected_output_sha256", "idempotency_key",
@@ -176,10 +177,14 @@ def validate_mission(mission: Dict[str, Any], observed_base_sha: str) -> None:
         raise FomStop("REFERENCE_MISSION_NOT_FULLY_REVERSIBLE")
     if mission["input_path"] not in mission["sources_required"]:
         raise FomStop("INPUT_NOT_DECLARED_AS_REQUIRED_SOURCE")
-    if mission["base_sha"] != observed_base_sha:
+    if mission["base_sha_policy"] == "PINNED" and mission["base_sha"] != observed_base_sha:
         raise FomStop(
             f"STALE_BASE_SHA:mission={mission['base_sha']}:observed={observed_base_sha}"
         )
+    if mission["base_sha_policy"] == "CURRENT_MAIN" and mission["base_sha"] != "CURRENT_MAIN":
+        raise FomStop("CURRENT_MAIN_BASE_POLICY_REQUIRES_EXPLICIT_SENTINEL")
+    if mission["base_sha_policy"] not in {"PINNED", "CURRENT_MAIN"}:
+        raise FomStop("UNKNOWN_BASE_SHA_POLICY")
     if mission["risk_level"] != "LOW":
         raise FomStop("RISK_NOT_ALLOWED_FOR_REFERENCE_MISSION")
 
@@ -227,13 +232,18 @@ def route_executor(mission: Dict[str, Any]) -> str:
     raise FomStop("NO_ELIGIBLE_EXECUTOR")
 
 
-def deterministic_run_id(mission: Dict[str, Any], input_hash: str) -> str:
+def deterministic_run_id(
+    mission: Dict[str, Any], input_hash: str, observed_base_sha: str, material_fingerprint: str
+) -> str:
     identity = "|".join(
         [
             mission["mission_id"],
             mission["idempotency_key"],
             mission["base_sha"],
+            mission["base_sha_policy"],
+            observed_base_sha,
             input_hash,
+            material_fingerprint,
             FOM_VERSION,
         ]
     )
@@ -305,7 +315,6 @@ def run_fom(
     repo_root: Path,
     output_root: Path,
     simulate_failure_before_commit: bool = False,
-    runner_path: Path | None = None,
 ) -> Dict[str, Any]:
     repo_root = repo_root.resolve()
     mission_path = mission_path if mission_path.is_absolute() else repo_root / mission_path
@@ -353,6 +362,24 @@ def run_fom(
     output_hash = sha256_text(canonical)
     input_file_hash = sha256_file(input_path)
 
+    effective_runner_path = Path(__file__).resolve()
+    material = {
+        "runner": execution_material_entry(
+            repo_root, runtime_head_sha, effective_runner_path, "RUNNER_PATH_ESCAPES_REPO"
+        ),
+        "mission": execution_material_entry(
+            repo_root, runtime_head_sha, mission_path, "MISSION_PATH_ESCAPES_REPO"
+        ),
+        "fixture": execution_material_entry(
+            repo_root, runtime_head_sha, input_path, "INPUT_PATH_ESCAPES_REPO"
+        ),
+    }
+    material_fingerprint = sha256_text(canonical_json({
+        "runtime_head_sha": runtime_head_sha,
+        "observed_base_sha": observed_base_sha,
+        "execution_material": material,
+    }))
+
     event(
         "executor_tool_use",
         "PASS",
@@ -380,7 +407,7 @@ def run_fom(
         human_gate="NOT_TRIGGERED_P0_P1_SYNTHETIC",
     )
 
-    run_id = deterministic_run_id(mission, input_file_hash)
+    run_id = deterministic_run_id(mission, input_file_hash, observed_base_sha, material_fingerprint)
     final_dir = output_root / run_id
     summary_path = final_dir / "run_summary.json"
 
@@ -406,27 +433,14 @@ def run_fom(
     try:
         event("trace_evidence", "PASS", output_staging=temp_dir.name)
 
-        effective_runner_path = (
-            runner_path.resolve() if runner_path is not None else Path(__file__).resolve()
-        )
-        material = {
-            "runner": execution_material_entry(
-                repo_root, runtime_head_sha, effective_runner_path, "RUNNER_PATH_ESCAPES_REPO"
-            ),
-            "mission": execution_material_entry(
-                repo_root, runtime_head_sha, mission_path, "MISSION_PATH_ESCAPES_REPO"
-            ),
-            "fixture": execution_material_entry(
-                repo_root, runtime_head_sha, input_path, "INPUT_PATH_ESCAPES_REPO"
-            ),
-        }
-
         manifest = {
             "fom_version": FOM_VERSION,
             "mission_id": mission["mission_id"],
             "issue": mission["issue"],
             "run_id": run_id,
             "base_ref": mission["base_ref"],
+            "base_sha_policy": mission["base_sha_policy"],
+            "declared_base_sha": mission["base_sha"],
             "base_sha": observed_base_sha,
             "runtime_head_sha": runtime_head_sha,
             "requested_executor": mission["requested_executor"],
@@ -487,7 +501,10 @@ def run_fom(
             "mission_id": mission["mission_id"],
             "run_id": run_id,
             "base_sha_observed": observed_base_sha,
+            "base_sha_policy": mission["base_sha_policy"],
+            "declared_base_sha": mission["base_sha"],
             "runtime_head_sha": runtime_head_sha,
+            "execution_material_fingerprint": material_fingerprint,
             "execution_material": material,
             "generated_by_runtime": True,
             "evidence_strength": "EXECUTION_REPRODUCED",

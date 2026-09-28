@@ -5,7 +5,9 @@
 `HARDENING_AD`
 
 Issue: #5  
-Base main observed for this hardening mission: `76a8e408de092163c61dfa6e7b8304a8dcedba0e`
+`MISSION_REFERENCE_SYNTHETIC.json` is the reusable current-main self-test. Its explicit `base_sha_policy: CURRENT_MAIN` and `base_sha: CURRENT_MAIN` declare that the runner must resolve and record the repository-observed `main` SHA at each run. This allows the documented check to remain valid after a merge.
+
+`MISSION_REFERENCE_HISTORICAL_2026-09-27.json` is the historical pinned contract for the review baseline (`76a8e408de092163c61dfa6e7b8304a8dcedba0e`). It uses `base_sha_policy: PINNED`; after `main` advances it is expected to stop with `STALE_BASE_SHA`. Use the reusable current-main self-test for later health checks.
 
 ## Objective
 
@@ -30,17 +32,18 @@ python tools/fom/run_fom_v0.py \
   --output-root evidence/fom
 ```
 
-The caller no longer injects `--observed-base-sha`. The runner resolves `main` directly from Git.
+The caller no longer injects `--observed-base-sha`. The runner resolves `main` from the local Git checkout, preferring `refs/remotes/origin/main`, then local `main`. It does not fetch; callers and CI must provide an up-to-date remote ref when repository freshness is required.
 
 ## Hardening A + D
 
 The post-merge adversarial audit found six gaps. This hardening addresses them:
 
-- live main is resolved by the runtime;
+- repository-observed `main` is resolved by the runtime without network fetch;
 - `WRITE_EVIDENCE_LOCAL` is mandatory because the runtime writes evidence;
 - output root is constrained under `repo/evidence`;
 - replay hashes trace/handoff/provenance as part of evidence integrity;
 - runtime emits runner/Mission/fixture execution provenance;
+- replay identity binds base policy, declared and observed base SHAs, runtime HEAD and execution-material fingerprint; runner path comes from the executing module, not caller input;
 - dedicated GitHub Actions workflow runs unit tests + Reference Mission + replay and uploads CI evidence.
 
 ## STOP tests
@@ -57,7 +60,9 @@ The unit suite covers:
 - handoff tamper → STOP;
 - controlled failure before atomic commit → zero final side effects;
 - exact replay → `IDEMPOTENT_REPLAY`;
-- runtime provenance emitted for runner/Mission/fixture.
+- runtime provenance emitted for runner/Mission/fixture;
+- historical pinned Mission stops when observed `main` moves;
+- reusable `CURRENT_MAIN` verification continues on later `main` revisions and records each observed base SHA.
 
 ## CI
 
