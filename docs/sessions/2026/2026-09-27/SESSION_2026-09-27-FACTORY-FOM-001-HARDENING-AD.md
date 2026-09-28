@@ -21,7 +21,7 @@ Implemented scope:
 1. FOM contract is 0.1.2; current-state bootstrap resolves repository-observed `main` from local Git refs; no network fetch is performed;
 2. caller-supplied observed SHA was removed from the CLI/runtime contract;
 3. runtime requires `WRITE_EVIDENCE_LOCAL` before writing evidence;
-4. output root is constrained under `repo/evidence`;
+4. output root is constrained under `repo/evidence`; symlink escape on the evidence root itself is rejected;
 5. replay validates integrity hashes for manifest, trace, result, handoff and provenance;
 6. runtime validates the actual executing runner, Mission and fixture against runtime HEAD before replay, with no caller-supplied runner path, and fingerprints execution material + observed base + runtime HEAD into the run identity;
 7. historical pinned and reusable `CURRENT_MAIN` Reference Mission semantics are explicit; stale-base checks remain enabled for pinned Missions.

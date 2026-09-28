@@ -41,6 +41,7 @@ The post-merge adversarial audit found six gaps. This hardening addresses them:
 - repository-observed `main` is resolved by the runtime without network fetch;
 - `WRITE_EVIDENCE_LOCAL` is mandatory because the runtime writes evidence;
 - output root is constrained under `repo/evidence`;
+- symlinked `repo/evidence` roots that resolve outside the repository stop;
 - replay hashes trace/handoff/provenance as part of evidence integrity;
 - runtime emits runner/Mission/fixture execution provenance;
 - replay identity binds base policy, declared and observed base SHAs, runtime HEAD and execution-material fingerprint; runner path comes from the executing module, not caller input;
@@ -54,6 +55,7 @@ The unit suite covers:
 - forbidden permission → STOP;
 - missing required write permission → STOP;
 - output root escape → STOP;
+- evidence-root symlink escape → STOP;
 - undeclared source → STOP;
 - incomplete evidence pack → STOP;
 - trace tamper → STOP;
@@ -68,7 +70,7 @@ The unit suite covers:
 
 Workflow:
 
-`.github/workflows/fom-v0.yml`
+`.github/workflows/fom-v0.yml` uses `pull_request.head.sha` for PR checkouts, so the evidence provenance binds to the exact PR head. Push runs check out the pushed commit.
 
 CI must show the FOM unit suite and Reference Mission passing before this hardening is ready for Human Gate.
 

@@ -112,7 +112,7 @@ O runtime registra também a identidade Git/arquivo do runner, Mission e fixture
 - replay idempotente;
 - upload do evidence pack como artifact.
 
-O CI usa checkout com histórico suficiente e remote ref para resolver a `main` pelo próprio Git, sem fetch dentro do runner. Executa a Mission reutilizável `CURRENT_MAIN`; a Mission histórica pinned não é usada como health check corrente.
+Em eventos `pull_request`, o workflow faz checkout explícito de `pull_request.head.sha`; em `push`, usa o commit acionador. Assim, a provenance do CI identifica exatamente o HEAD validado no PR. O CI usa histórico suficiente e remote ref para resolver a `main` pelo próprio Git, sem fetch dentro do runner. Executa a Mission reutilizável `CURRENT_MAIN`; a Mission histórica pinned não é usada como health check corrente.
 
 ## 10. FOM CLOSED — Definition of Done
 

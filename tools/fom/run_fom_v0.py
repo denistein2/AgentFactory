@@ -128,7 +128,9 @@ def path_inside(root: Path, candidate: Path, stop_reason: str) -> Path:
 
 def resolve_output_root(repo_root: Path, output_root: Path) -> Path:
     repo_root = repo_root.resolve()
-    evidence_root = (repo_root / "evidence").resolve()
+    evidence_root = path_inside(
+        repo_root, repo_root / "evidence", "EVIDENCE_ROOT_ESCAPES_REPO"
+    )
     candidate = output_root if output_root.is_absolute() else repo_root / output_root
     candidate = candidate.resolve()
     try:

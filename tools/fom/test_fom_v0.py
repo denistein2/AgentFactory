@@ -229,6 +229,21 @@ class FomV0HardeningTests(unittest.TestCase):
                 )
             self.assertIn("OUTPUT_ROOT_OUTSIDE_REPO_EVIDENCE", str(ctx.exception))
 
+    def test_evidence_root_symlink_escape_stops(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mission_path, _, _, runtime = self.setup_repo(root)
+            outside = root.parent / (root.name + "-outside-evidence")
+            outside.mkdir()
+            try:
+                (root / "evidence").symlink_to(outside, target_is_directory=True)
+                with self.assertRaises(runtime.FomStop) as ctx:
+                    self.run_fom(runtime, mission_path, root)
+                self.assertIn("EVIDENCE_ROOT_ESCAPES_REPO", str(ctx.exception))
+            finally:
+                if outside.exists():
+                    shutil.rmtree(outside)
+
     def test_trace_tamper_stops_replay(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
