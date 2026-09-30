@@ -466,6 +466,250 @@
     .system-grid,.settings-grid{grid-template-columns:1fr}
   }
 
+
+  /* ---------- MOBILE HARDENING V2 · 2026-09-30 ---------- */
+  /* Final override layer: intentionally placed last so it wins over legacy dashboard rules. */
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  .app, .main, .topbar, .top-right, .toggle-wrap, .hero, .grid, .card,
+  .tiles, .gatebar, .agents, .kpis, .system-grid, .settings-grid,
+  .options-head, .option-row, .roulette-row, .proj, .li, .doc, .ck {
+    min-width:0;
+    max-width:100%;
+  }
+  img, svg, canvas { max-width:100%; }
+  .card, .system-item, .setting, .proj, .li, .doc, .ck,
+  .option-row, .roulette-row { overflow-wrap:anywhere; }
+  .mono { overflow-wrap:anywhere; word-break:break-word; }
+
+  @media (max-width:1024px) {
+    .app { display:block; width:100%; min-width:0; }
+
+    .side {
+      position:sticky; top:0; z-index:60;
+      width:100%; height:auto;
+      padding:max(9px, env(safe-area-inset-top)) 10px 8px;
+      display:block;
+      border-right:0; border-bottom:1px solid var(--edge);
+      background:rgba(8,13,22,.97);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .side .status { display:none; }
+    .brand { padding:0 2px 8px; gap:9px; }
+    .brand .logo { width:34px; height:34px; border-radius:10px; }
+    .brand .logo svg { width:20px; height:20px; }
+    .brand b { font-size:14px; line-height:1.05; }
+    .brand b br { display:none; }
+    .brand span { font-size:10px; }
+
+    .side .nav {
+      display:flex; flex-wrap:nowrap; gap:6px;
+      width:100%; max-width:100%; overflow-x:auto;
+      padding:0 0 3px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x proximity;
+      overscroll-behavior-x:contain;
+    }
+    .side .nav::-webkit-scrollbar { display:none; }
+    .nav a {
+      flex:0 0 auto;
+      scroll-snap-align:start;
+      min-height:42px;
+      padding:9px 11px;
+      font-size:11.5px;
+      gap:7px;
+      white-space:nowrap;
+      background:var(--panel);
+      border:1px solid var(--edge);
+    }
+    .nav a .ic { width:15px; height:15px; }
+
+    .main {
+      width:100%;
+      max-width:100%;
+      padding:14px 12px calc(28px + env(safe-area-inset-bottom));
+      margin:0;
+    }
+
+    .topbar { display:block; width:100%; margin-bottom:14px; }
+    .topbar h1 { font-size:clamp(20px, 5vw, 25px); line-height:1.15; overflow-wrap:anywhere; }
+    .topbar .sub { font-size:12px; line-height:1.4; }
+    .top-right {
+      margin-top:12px;
+      width:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+    }
+    .mode { min-width:0; width:100%; padding:8px 10px; }
+    .who { min-width:0; }
+    .who .nm, .who .rl { white-space:normal; }
+
+    .toggle-wrap { display:block; width:100%; padding:13px; margin-bottom:14px; }
+    .toggle-wrap .tl { max-width:none; font-size:12px; line-height:1.45; }
+    .switch { width:100%; margin-top:12px; }
+    .switch button {
+      flex:1 1 0;
+      min-width:0;
+      min-height:44px;
+      justify-content:center;
+      padding:9px 8px;
+      font-size:11.5px;
+      white-space:normal;
+      text-align:center;
+    }
+
+    .hero {
+      width:100%;
+      min-height:0;
+      padding:18px 15px;
+      margin-bottom:14px;
+      display:grid;
+      grid-template-columns:58px minmax(0,1fr);
+      align-items:center;
+      gap:12px;
+    }
+    .hero .tag {
+      position:static;
+      grid-column:1/-1;
+      grid-row:1;
+      width:max-content;
+      max-width:100%;
+      padding:5px 9px;
+      font-size:9.5px;
+      white-space:normal;
+    }
+    .hero .reticle { grid-column:1; grid-row:2; }
+    .hero .reticle, .hero .reticle svg { width:58px; height:58px; }
+    .hero h2 {
+      grid-column:2;
+      grid-row:2;
+      min-width:0;
+      max-width:none;
+      font-size:clamp(16px, 4.5vw, 20px);
+      line-height:1.35;
+      overflow-wrap:anywhere;
+      position:relative;
+      z-index:2;
+    }
+    .hero .city { width:70%; opacity:.24; }
+
+    .row { margin-bottom:12px; }
+    .grid, .g-2, .g-2b, .g-4,
+    .tiles, .gatebar, .agents, .kpis,
+    .system-grid, .settings-grid {
+      grid-template-columns:minmax(0,1fr) !important;
+      gap:10px;
+      width:100%;
+    }
+    .main .grid[style*="grid-template-columns"] {
+      grid-template-columns:minmax(0,1fr) !important;
+    }
+
+    .card { width:100%; padding:14px 13px; border-radius:12px; }
+    .card h3 { font-size:14px; line-height:1.3; }
+    .card .h-sub { font-size:11.5px; line-height:1.4; margin-bottom:12px; }
+    .card .link { float:none; display:inline-block; margin-top:4px; }
+
+    .tiles, .gatebar { gap:8px; }
+    .tile, .gate { width:100%; }
+    .tile .num { font-size:23px; }
+
+    .options-head { display:block; width:100%; }
+    .legend { justify-content:flex-start; margin-top:10px; gap:8px 10px; }
+    .option-row {
+      width:100%;
+      grid-template-columns:16px minmax(0,1fr);
+      align-items:start;
+      padding:11px 10px;
+    }
+    .option-row .tag-mini { grid-column:2; justify-self:start; margin-top:2px; white-space:normal; }
+    .roulette-row {
+      width:100%;
+      grid-template-columns:16px minmax(0,1fr);
+      align-items:start;
+      padding:12px 10px;
+    }
+    .roulette-controls {
+      grid-column:1/-1;
+      width:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr);
+      gap:10px;
+      justify-content:stretch;
+      margin-top:4px;
+    }
+    .roulette-btn { width:100%; min-height:46px; }
+    .roulette-toggle { min-height:40px; white-space:normal; }
+
+    .pipe {
+      width:100%;
+      max-width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      justify-content:flex-start;
+      padding:8px 2px 10px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-x:contain;
+    }
+    .step { flex:0 0 112px; scroll-snap-align:start; }
+    .step .node { width:46px; height:46px; }
+    .step::after { top:23px; }
+
+    .proj, .agent, .kpi { width:100%; }
+    .proj-head { flex-wrap:wrap; align-items:flex-start; }
+    .badge { margin-left:0; max-width:100%; white-space:normal; }
+    .proj .foot { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+
+    .li {
+      width:100%;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:8px 10px;
+      padding:10px;
+    }
+    .li .body { min-width:0; }
+    .li .when { grid-column:2; white-space:normal; overflow-wrap:anywhere; }
+
+    .doc, .ck { width:100%; }
+    .doc > div:last-child, .ck { min-width:0; }
+    .foot-note { margin-top:16px; padding:12px; font-size:11px; line-height:1.5; }
+
+    .anchor-section { scroll-margin-top:96px; }
+  }
+
+  @media (max-width:600px) {
+    .main { padding-left:10px; padding-right:10px; }
+    .top-right { grid-template-columns:minmax(0,1fr); }
+    .who { justify-content:flex-start; }
+    .mode { width:100%; }
+
+    .hero { grid-template-columns:48px minmax(0,1fr); padding:15px 12px; }
+    .hero .reticle, .hero .reticle svg { width:48px; height:48px; }
+    .hero h2 { font-size:16px; }
+
+    .switch button { font-size:10.5px; }
+    .nav a { font-size:11px; }
+    .brand span { display:none; }
+
+    .tile, .gate, .agent, .kpi, .system-item, .setting {
+      padding-left:11px;
+      padding-right:11px;
+    }
+  }
+
+  @media (max-width:360px) {
+    .main { padding-left:8px; padding-right:8px; }
+    .hero { grid-template-columns:42px minmax(0,1fr); gap:9px; }
+    .hero .reticle, .hero .reticle svg { width:42px; height:42px; }
+    .hero h2 { font-size:15px; }
+    .switch { display:grid; grid-template-columns:1fr; }
+    .topbar h1 { font-size:19px; }
+  }
+
 </style>
 </head>
 <body data-mode="today">
