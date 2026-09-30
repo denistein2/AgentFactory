@@ -1,0 +1,31 @@
+name: Command Center Control Plane
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "api/**"
+      - "control/**"
+      - "docs/architecture/COMMAND_CENTER_CONTROL_PLANE_V1.md"
+      - "tools/validate-command-center-v1.mjs"
+      - ".github/workflows/command-center-control.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate-control-plane
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate Command Center
+        run: node tools/validate-command-center-v1.mjs
