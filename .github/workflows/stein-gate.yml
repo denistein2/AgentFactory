@@ -1,0 +1,130 @@
+name: Stein Gate
+
+# Universal, path-agnostic PR gate. One stable required-check context:
+#   universal-pr-gate   (GitHub Actions app_id 15368)
+# Read-only: never pushes, comments, labels, or calls write APIs.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    # deliberately NO branches: and NO paths: filters
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stein-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: universal-pr-gate          # <-- exact required-check context; do not rename
+    runs-on: ubuntu-24.04            # pinned image instead of -latest, for determinism
+    timeout-minutes: 5
+    steps:
+      - name: Checkout (PR merge ref)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # tag v4, resolved 2026-09-30
+        with:
+          fetch-depth: 2               # merge commit + both parents
+          persist-credentials: false   # no token left in .git/config
+
+      - name: Identify exact SHAs (prove checkout)
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          CHECKED_OUT="$(git rev-parse HEAD)"
+          {
+            echo "### Stein Gate"
+            echo "- repository: \`${GITHUB_REPOSITORY}\`"
+            echo "- event: \`${GITHUB_EVENT_NAME}\` PR: \`${PR_NUMBER:-n/a}\`"
+            echo "- checked-out: \`${CHECKED_OUT}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "${PR_HEAD_SHA:-}" ]; then
+            BASE_PARENT="$(git rev-parse HEAD^1)"
+            HEAD_PARENT="$(git rev-parse HEAD^2)"
+            echo "- base parent (main at merge-ref time): \`${BASE_PARENT}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- **PR head (gated SHA): \`${PR_HEAD_SHA}\`**" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$HEAD_PARENT" != "$PR_HEAD_SHA" ]; then
+              echo "::error::merge-ref second parent ${HEAD_PARENT} != PR head ${PR_HEAD_SHA}"
+              exit 1
+            fi
+          fi
+
+      - name: Sentinel files (right repository, real checkout)
+        run: |
+          set -euo pipefail
+          for f in GOVERNANCE.md SECURITY.md \
+                   package/stein-db-twin/policies/human-gates.json \
+                   package/stein-db-twin/policies/permissions.json; do
+            git ls-files --error-unmatch "$f" >/dev/null || { echo "::error::sentinel missing: $f"; exit 1; }
+          done
+
+      - name: All tracked JSON parses
+        run: |
+          set -euo pipefail
+          git ls-files -z -- '*.json' | python3 -c '
+          import json, sys
+          bad = 0
+          for p in sys.stdin.buffer.read().split(b"\0"):
+              if not p: continue
+              p = p.decode()
+              try: json.load(open(p, encoding="utf-8"))
+              except Exception as e:
+                  print(f"::error file={p}::invalid JSON: {e}"); bad = 1
+          sys.exit(bad)'
+
+      - name: Governance invariants (machine-readable policy)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, sys
+          g = json.load(open("package/stein-db-twin/policies/human-gates.json", encoding="utf-8"))
+          need = {"pull_request_merge", "production_deploy", "git_push"}
+          miss = need - set(g.get("always_require_human", []))
+          ok = True
+          if miss: print("::error::always_require_human missing:", sorted(miss)); ok = False
+          if g.get("guards", {}).get("fail_closed") is not True:
+              print("::error::guards.fail_closed must be true"); ok = False
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Forbidden file names (reused from session-pr STOP-03, tree-wide)
+        run: |
+          set -euo pipefail
+          HITS="$(git ls-files | grep -E 'Testbank\.sql|\.dump$|_REAL\.|credentials.*\.json|(^|/)\.env($|\.)|\.pem$|\.key$|dump_completo|\.sqlite3?$|\.db$' || true)"
+          if [ -n "$HITS" ]; then echo "::error::forbidden files:"; echo "$HITS"; exit 1; fi
+
+      - name: Secret patterns by content (reused + GitHub token formats)
+        run: |
+          set -euo pipefail
+          if git grep -nIE '(AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]+|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,})' -- . >/dev/null; then
+            echo "::error::possible secret in tracked content (location intentionally not printed)"; exit 1
+          fi
+
+      - name: No unresolved conflict markers
+        run: |
+          set -euo pipefail
+          if git grep -nIE '^(<{7} |>{7} )'; then echo "::error::conflict markers"; exit 1; fi
+
+      - name: No tracked file over 5 MiB
+        run: |
+          set -euo pipefail
+          BIG="$(git ls-files -z | xargs -0 -r stat -c '%s %n' | awk '$1>5242880{print $2}')"
+          if [ -n "$BIG" ]; then echo "::error::oversize: $BIG"; exit 1; fi
+
+      - name: Workflow-change notice (informational)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          CHANGED="$(git diff --name-only HEAD^1 HEAD -- .github/ || true)"
+          if [ -n "$CHANGED" ]; then
+            echo "::warning::PR modifies .github/ — human reviewer must inspect: $CHANGED"
+            echo "- ⚠ modifies \`.github/\`: $CHANGED" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Verdict
+        if: always()
+        run: echo "STEIN GATE ${{ job.status }} for PR head ${{ github.event.pull_request.head.sha || github.sha }}" | tee -a "$GITHUB_STEP_SUMMARY"
