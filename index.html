@@ -998,3 +998,95 @@ function render(mode){
       <span class="tag-mini">${o.tag || stateLabel[o.state]}</span>
     </div>`).join('');
   document.getElementById('rouletteResult').style.display='none';
+  document.getElementById('rouletteResult').className='roulette-result';
+
+  // docs
+  document.getElementById('docs').innerHTML=d.docs.map(x=>`
+    <div class="doc"><div class="n">${x.n}</div><div><b>${x.b}</b><span>${x.s}</span></div></div>`).join('');
+}
+
+function activeMode(){ return document.body.dataset.mode || 'today'; }
+
+function roulettePool(){
+  const d=DATA[activeMode()];
+  const includeGray=document.getElementById('includeGray')?.checked;
+  return d.options.filter(o => o.state!=='red' && (o.eligible || (includeGray && o.state==='gray')) && (o.weight||0)>0);
+}
+
+function weightedPick(pool){
+  const weighted=document.getElementById('weightedRoulette')?.checked !== false;
+  if(!weighted) return pool[Math.floor(Math.random()*pool.length)];
+  const bag=[];
+  pool.forEach(o=>{ for(let i=0;i<(o.weight||1);i++) bag.push(o); });
+  return bag[Math.floor(Math.random()*bag.length)];
+}
+
+function spinRoulette(){
+  const pool=roulettePool();
+  const out=document.getElementById('rouletteResult');
+  const btn=document.getElementById('rouletteBtn');
+  if(!pool.length){
+    out.style.display='block';
+    out.innerHTML='<b>Sem opções elegíveis.</b> A roleta não atravessa bloqueios ou Human Gates.';
+    return;
+  }
+  btn.disabled=true;
+  out.style.display='block';
+  out.className='roulette-result spinning';
+  let ticks=0;
+  const timer=setInterval(()=>{
+    const temp=pool[ticks%pool.length];
+    out.innerHTML=`Girando… <b>${temp.title}</b>`;
+    ticks++;
+    if(ticks>=12){
+      clearInterval(timer);
+      const pick=weightedPick(pool);
+      out.className='roulette-result';
+      out.innerHTML=`🎯 Sugestão da roleta: <b>${pick.title}</b><br><span style="font-size:11px;color:var(--ink3)">${pick.sub} · sugestão, não autorização.</span>`;
+      btn.disabled=false;
+    }
+  },70);
+}
+
+function setMode(mode){
+  const bt=document.getElementById('btnToday'), bg=document.getElementById('btnTarget');
+  if(mode==='today'){bt.className='sel-today';bg.className='';}
+  else{bt.className='';bg.className='sel-target';}
+  render(mode);
+}
+
+function activateNav(target, shouldScroll=true){
+  const el=document.getElementById(target);
+  if(!el) return;
+  document.querySelectorAll('.nav a[data-section]').forEach(a=>a.classList.toggle('active',a.dataset.section===target));
+  if(document.getElementById('rememberView')?.checked !== false){
+    try{ localStorage.setItem('factoryCommandCenter.section',target); }catch(e){}
+  }
+  if(shouldScroll) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.querySelectorAll('.nav a[data-section]').forEach(a=>{
+  a.addEventListener('click',ev=>{
+    ev.preventDefault();
+    activateNav(a.dataset.section,true);
+  });
+});
+
+const navObserver=new IntersectionObserver(entries=>{
+  const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+  if(!visible) return;
+  const target=visible.target.id;
+  document.querySelectorAll('.nav a[data-section]').forEach(a=>a.classList.toggle('active',a.dataset.section===target));
+},{rootMargin:'-18% 0px -68% 0px',threshold:[0,.1,.25,.5]});
+
+document.querySelectorAll('.anchor-section[id]').forEach(el=>navObserver.observe(el));
+
+try{
+  const saved=localStorage.getItem('factoryCommandCenter.section');
+  if(saved && document.getElementById(saved)) setTimeout(()=>activateNav(saved,false),0);
+}catch(e){}
+
+render('today');
+</script>
+</body>
+</html>
