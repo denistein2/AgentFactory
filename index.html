@@ -466,6 +466,297 @@
     .system-grid,.settings-grid{grid-template-columns:1fr}
   }
 
+
+  /* ---------- MOBILE HARDENING V2 · 2026-09-30 ---------- */
+  /* Final override layer: intentionally placed last so it wins over legacy dashboard rules. */
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  .app, .main, .topbar, .top-right, .toggle-wrap, .hero, .grid, .card,
+  .tiles, .gatebar, .agents, .kpis, .system-grid, .settings-grid,
+  .options-head, .option-row, .roulette-row, .proj, .li, .doc, .ck {
+    min-width:0;
+    max-width:100%;
+  }
+  img, svg, canvas { max-width:100%; }
+  .card, .system-item, .setting, .proj, .li, .doc, .ck,
+  .option-row, .roulette-row { overflow-wrap:anywhere; }
+  .mono { overflow-wrap:anywhere; word-break:break-word; }
+
+  @media (max-width:1024px) {
+    .app { display:block; width:100%; min-width:0; }
+
+    .side {
+      position:sticky; top:0; z-index:60;
+      width:100%; height:auto;
+      padding:max(9px, env(safe-area-inset-top)) 10px 8px;
+      display:block;
+      border-right:0; border-bottom:1px solid var(--edge);
+      background:rgba(8,13,22,.97);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .side .status { display:none; }
+    .brand { padding:0 2px 8px; gap:9px; }
+    .brand .logo { width:34px; height:34px; border-radius:10px; }
+    .brand .logo svg { width:20px; height:20px; }
+    .brand b { font-size:14px; line-height:1.05; }
+    .brand b br { display:none; }
+    .brand span { font-size:10px; }
+
+    .side .nav {
+      display:flex; flex-wrap:nowrap; gap:6px;
+      width:100%; max-width:100%; overflow-x:auto;
+      padding:0 0 3px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x proximity;
+      overscroll-behavior-x:contain;
+    }
+    .side .nav::-webkit-scrollbar { display:none; }
+    .nav a {
+      flex:0 0 auto;
+      scroll-snap-align:start;
+      min-height:42px;
+      padding:9px 11px;
+      font-size:11.5px;
+      gap:7px;
+      white-space:nowrap;
+      background:var(--panel);
+      border:1px solid var(--edge);
+    }
+    .nav a .ic { width:15px; height:15px; }
+
+    .main {
+      width:100%;
+      max-width:100%;
+      padding:14px 12px calc(28px + env(safe-area-inset-bottom));
+      margin:0;
+    }
+
+    .topbar { display:block; width:100%; margin-bottom:14px; }
+    .topbar h1 { font-size:clamp(20px, 5vw, 25px); line-height:1.15; overflow-wrap:anywhere; }
+    .topbar .sub { font-size:12px; line-height:1.4; }
+    .top-right {
+      margin-top:12px;
+      width:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+    }
+    .mode { min-width:0; width:100%; padding:8px 10px; }
+    .who { min-width:0; }
+    .who .nm, .who .rl { white-space:normal; }
+
+    .toggle-wrap { display:block; width:100%; padding:13px; margin-bottom:14px; }
+    .toggle-wrap .tl { max-width:none; font-size:12px; line-height:1.45; }
+    .switch { width:100%; margin-top:12px; }
+    .switch button {
+      flex:1 1 0;
+      min-width:0;
+      min-height:44px;
+      justify-content:center;
+      padding:9px 8px;
+      font-size:11.5px;
+      white-space:normal;
+      text-align:center;
+    }
+
+    .hero {
+      width:100%;
+      min-height:0;
+      padding:18px 15px;
+      margin-bottom:14px;
+      display:grid;
+      grid-template-columns:58px minmax(0,1fr);
+      align-items:center;
+      gap:12px;
+    }
+    .hero .tag {
+      position:static;
+      grid-column:1/-1;
+      grid-row:1;
+      width:max-content;
+      max-width:100%;
+      padding:5px 9px;
+      font-size:9.5px;
+      white-space:normal;
+    }
+    .hero .reticle { grid-column:1; grid-row:2; }
+    .hero .reticle, .hero .reticle svg { width:58px; height:58px; }
+    .hero h2 {
+      grid-column:2;
+      grid-row:2;
+      min-width:0;
+      max-width:none;
+      font-size:clamp(16px, 4.5vw, 20px);
+      line-height:1.35;
+      overflow-wrap:anywhere;
+      position:relative;
+      z-index:2;
+    }
+    .hero .city { width:70%; opacity:.24; }
+
+    .row { margin-bottom:12px; }
+    .grid, .g-2, .g-2b, .g-4,
+    .tiles, .gatebar, .agents, .kpis,
+    .system-grid, .settings-grid {
+      grid-template-columns:minmax(0,1fr) !important;
+      gap:10px;
+      width:100%;
+    }
+    .main .grid[style*="grid-template-columns"] {
+      grid-template-columns:minmax(0,1fr) !important;
+    }
+
+    .card { width:100%; padding:14px 13px; border-radius:12px; }
+    .card h3 { font-size:14px; line-height:1.3; }
+    .card .h-sub { font-size:11.5px; line-height:1.4; margin-bottom:12px; }
+    .card .link { float:none; display:inline-block; margin-top:4px; }
+
+    .tiles, .gatebar { gap:8px; }
+    .tile, .gate { width:100%; }
+    .tile .num { font-size:23px; }
+
+    .options-head { display:block; width:100%; }
+    .legend { justify-content:flex-start; margin-top:10px; gap:8px 10px; }
+    .option-row {
+      width:100%;
+      grid-template-columns:16px minmax(0,1fr);
+      align-items:start;
+      padding:11px 10px;
+    }
+    .option-row .tag-mini { grid-column:2; justify-self:start; margin-top:2px; white-space:normal; }
+    .roulette-row {
+      width:100%;
+      grid-template-columns:16px minmax(0,1fr);
+      align-items:start;
+      padding:12px 10px;
+    }
+    .roulette-controls {
+      grid-column:1/-1;
+      width:100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr);
+      gap:10px;
+      justify-content:stretch;
+      margin-top:4px;
+    }
+    .roulette-btn { width:100%; min-height:46px; }
+    .roulette-toggle { min-height:40px; white-space:normal; }
+
+    .pipe {
+      width:100%;
+      max-width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      justify-content:flex-start;
+      padding:8px 2px 10px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-x:contain;
+    }
+    .step { flex:0 0 112px; scroll-snap-align:start; }
+    .step .node { width:46px; height:46px; }
+    .step::after { top:23px; }
+
+    .proj, .agent, .kpi { width:100%; }
+    .proj-head { flex-wrap:wrap; align-items:flex-start; }
+    .badge { margin-left:0; max-width:100%; white-space:normal; }
+    .proj .foot { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+
+    .li {
+      width:100%;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:8px 10px;
+      padding:10px;
+    }
+    .li .body { min-width:0; }
+    .li .when { grid-column:2; white-space:normal; overflow-wrap:anywhere; }
+
+    .doc, .ck { width:100%; }
+    .doc > div:last-child, .ck { min-width:0; }
+    .foot-note { margin-top:16px; padding:12px; font-size:11px; line-height:1.5; }
+
+    .anchor-section { scroll-margin-top:96px; }
+  }
+
+  @media (max-width:600px) {
+    .main { padding-left:10px; padding-right:10px; }
+    .top-right { grid-template-columns:minmax(0,1fr); }
+    .who { justify-content:flex-start; }
+    .mode { width:100%; }
+
+    .hero { grid-template-columns:48px minmax(0,1fr); padding:15px 12px; }
+    .hero .reticle, .hero .reticle svg { width:48px; height:48px; }
+    .hero h2 { font-size:16px; }
+
+    .switch button { font-size:10.5px; }
+    .nav a { font-size:11px; }
+    .brand span { display:none; }
+
+    .tile, .gate, .agent, .kpi, .system-item, .setting {
+      padding-left:11px;
+      padding-right:11px;
+    }
+  }
+
+  @media (max-width:360px) {
+    .main { padding-left:8px; padding-right:8px; }
+    .hero { grid-template-columns:42px minmax(0,1fr); gap:9px; }
+    .hero .reticle, .hero .reticle svg { width:42px; height:42px; }
+    .hero h2 { font-size:15px; }
+    .switch { display:grid; grid-template-columns:1fr; }
+    .topbar h1 { font-size:19px; }
+  }
+
+
+  /* ---------- LIVE CONTROL PLANE ---------- */
+  .control-card{border-color:rgba(46,230,200,.38);background:
+    radial-gradient(800px 240px at 100% 0%,rgba(46,230,200,.08),transparent 60%),
+    linear-gradient(180deg,var(--panel2),var(--panel))}
+  .control-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .control-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .control-btn{border:1px solid var(--edge2);background:var(--bg2);color:var(--ink2);font:600 11.5px inherit;
+    border-radius:9px;padding:8px 11px;cursor:pointer;transition:.15s}
+  .control-btn:hover{color:var(--ink);border-color:rgba(46,230,200,.45)}
+  .control-btn.private{border-color:rgba(157,123,240,.45);color:var(--violet)}
+  .control-meta{font-size:10.5px;color:var(--ink3);text-align:right;margin-top:5px}
+  .source-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+  .source-card{background:var(--bg2);border:1px solid var(--edge);border-radius:11px;padding:12px;min-width:0}
+  .source-card b{display:block;font-size:12.5px;margin:7px 0 3px;overflow-wrap:anywhere}
+  .source-card span:last-child{display:block;color:var(--ink3);font-size:10.5px;line-height:1.35;overflow-wrap:anywhere}
+  .source-state{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:3px 7px;border-radius:8px;display:inline-block}
+  .src-live{background:rgba(58,208,122,.14);color:var(--green);border:1px solid rgba(58,208,122,.32)}
+  .src-next{background:rgba(240,180,69,.13);color:var(--amber);border:1px solid rgba(240,180,69,.32)}
+  .src-lock{background:rgba(157,123,240,.13);color:var(--violet);border:1px solid rgba(157,123,240,.32)}
+  .src-off{background:rgba(107,124,148,.13);color:var(--ink2);border:1px solid var(--edge2)}
+  .src-bad{background:rgba(240,101,79,.13);color:var(--red);border:1px solid rgba(240,101,79,.32)}
+  .focus-shell{display:grid;grid-template-columns:1.35fr .65fr;gap:12px}
+  .focus-panel,.submarine-panel{background:var(--bg2);border:1px solid var(--edge);border-radius:12px;padding:14px}
+  .focus-title{font-size:12px;font-weight:700;margin-bottom:4px}
+  .focus-north{font-size:11px;color:var(--teal);margin-bottom:11px;line-height:1.4}
+  .focus-queue{display:flex;flex-direction:column;gap:7px}
+  .focus-item{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:8px 9px;border:1px solid var(--edge);
+    border-radius:9px;background:rgba(8,13,22,.45)}
+  .focus-order{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:rgba(46,230,200,.09);
+    color:var(--teal);font-size:10.5px;font-weight:800}
+  .focus-item b{font-size:11.5px;line-height:1.25;overflow-wrap:anywhere}
+  .focus-item small{display:block;color:var(--ink3);font-size:9.8px;margin-top:2px}
+  .focus-status{font-size:9px;font-weight:800;color:var(--ink2);white-space:nowrap}
+  .submarine-panel .big-state{font-size:28px;font-weight:800;letter-spacing:.4px;color:var(--ink2);margin:9px 0 4px}
+  .submarine-panel .big-state.off{color:var(--amber)}
+  .submarine-panel .big-state.on{color:var(--green)}
+  .submarine-panel p{font-size:10.8px;color:var(--ink3);line-height:1.45;margin:0 0 10px}
+  .mini-pipe{display:flex;flex-wrap:wrap;gap:5px}
+  .mini-pipe span{font-size:9px;border:1px solid var(--edge2);border-radius:7px;padding:4px 6px;color:var(--ink2)}
+  .privacy-note{margin-top:12px;font-size:10.5px;color:var(--ink3);border-top:1px solid var(--edge);padding-top:10px}
+  @media(max-width:1100px){.source-grid{grid-template-columns:repeat(2,1fr)}.focus-shell{grid-template-columns:1fr}}
+  @media(max-width:600px){
+    .control-head{flex-direction:column}.control-actions{justify-content:flex-start;width:100%}.control-meta{text-align:left}
+    .source-grid{grid-template-columns:1fr}.focus-item{grid-template-columns:26px 1fr}.focus-status{grid-column:2}
+  }
+
 </style>
 </head>
 <body data-mode="today">
@@ -486,11 +777,12 @@
       <a href="#products-section" data-section="products-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>4. Produtos</a>
       <a href="#dbtwin-section" data-section="dbtwin-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg>5. Banco Gêmeo</a>
       <a href="#evidence-section" data-section="evidence-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>6. Evidências</a>
-      <a href="#github-section" data-section="github-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 19c-4 1-4-2-6-2m12 4v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 00-1.3-3.2 4.3 4.3 0 00-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 00-6 0C6.3 3 5.3 3.3 5.3 3.3a4.3 4.3 0 00-.1 3.2A4.6 4.6 0 004 9.7c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>7. GitHub / PRs</a>
-      <a href="#drive-section" data-section="drive-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 7l3-4h12l3 4"/></svg>8. Drive / Custódia</a>
-      <a href="#gates-section" data-section="gates-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>9. Gates</a>
-      <a href="#command-center" data-section="command-center"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>10. Command Center</a>
-      <a href="#settings-section" data-section="settings-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 00-1.7 1l-2.3-1-2 3.4L4.1 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.3 2.5h4l.3-2.5a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5a7 7 0 00.1-1z"/></svg>11. Configurações</a>
+      <a href="#control-section" data-section="control-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h8"/></svg>7. Controle Vivo</a>
+      <a href="#github-section" data-section="github-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 19c-4 1-4-2-6-2m12 4v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 00-1.3-3.2 4.3 4.3 0 00-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 00-6 0C6.3 3 5.3 3.3 5.3 3.3a4.3 4.3 0 00-.1 3.2A4.6 4.6 0 004 9.7c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>8. GitHub / PRs</a>
+      <a href="#drive-section" data-section="drive-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 7l3-4h12l3 4"/></svg>9. Drive / Custódia</a>
+      <a href="#gates-section" data-section="gates-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>10. Gates</a>
+      <a href="#command-center" data-section="command-center"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>11. Command Center</a>
+      <a href="#settings-section" data-section="settings-section"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 00-1.7 1l-2.3-1-2 3.4L4.1 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.3 2.5h4l.3-2.5a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5a7 7 0 00.1-1z"/></svg>12. Configurações</a>
     </nav>
     <div class="status">
       <b><span class="dot"></span>Fábrica Online</b><br>
@@ -509,7 +801,7 @@
       <div class="top-right">
         <div class="mode">
           <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.7"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
-          <div>Modo Noturno<br><span class="on">● Projetado</span></div>
+          <div>Modo Submarino<br><span class="on" id="submarineTopState">● OFF · preparado</span></div>
         </div>
         <div class="who">
           <div class="av">DS</div>
@@ -636,6 +928,57 @@
       </div>
     </div>
 
+
+    <!-- LIVE CONTROL PLANE -->
+    <div class="row anchor-section" id="control-section">
+      <div class="card control-card">
+        <div class="control-head">
+          <div>
+            <h3><svg class="hi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h8"/></svg>Control Plane · foco vivo</h3>
+            <div class="h-sub">API read-only, provenance explícita e fronteira pública/privada. Nenhum botão abaixo abre Human Gate.</div>
+          </div>
+          <div>
+            <div class="control-actions">
+              <button class="control-btn" id="controlRefresh" type="button">↻ Atualizar</button>
+              <button class="control-btn private" id="privateUnlock" type="button">⌾ Desbloquear privado</button>
+              <button class="control-btn" id="privateLock" type="button" style="display:none">Bloquear</button>
+            </div>
+            <div class="control-meta" id="controlUpdated">snapshot local · aguardando API</div>
+          </div>
+        </div>
+
+        <div class="source-grid" id="controlSources">
+          <div class="source-card"><span class="source-state src-next">LOADING</span><b>GitHub</b><span>Buscando estado sanitizado.</span></div>
+          <div class="source-card"><span class="source-state src-lock">LOCKED</span><b>Brain</b><span>Conteúdo privado nunca entra no bundle público.</span></div>
+          <div class="source-card"><span class="source-state src-lock">LOCKED</span><b>Drive</b><span>Adapter server-side/OAuth necessário.</span></div>
+          <div class="source-card"><span class="source-state src-off">OFF</span><b>Submarino</b><span>Telemetria preparada; execução autônoma desativada.</span></div>
+          <div class="source-card"><span class="source-state src-next">PLANNED</span><b>Auditor adversarial</b><span>Claude Code / auditor independente ainda não conectado.</span></div>
+        </div>
+
+        <div class="focus-shell">
+          <div class="focus-panel">
+            <div class="focus-title">Golden Rabbit · ERP Food Control</div>
+            <div class="focus-north" id="focusNorth">Pedido/PDV → Pagamento/Caixa → Fiscal → Entrega → Financeiro → Contábil</div>
+            <div class="focus-queue" id="focusQueue">
+              <div class="focus-item"><span class="focus-order">1</span><div><b>PDV reliability + idempotency</b><small>detalhes privados bloqueados</small></div><span class="focus-status">ACTIVE</span></div>
+            </div>
+          </div>
+          <div class="submarine-panel">
+            <div class="focus-title">Submarino</div>
+            <div class="big-state off" id="submarineState">OFF</div>
+            <p id="submarineNote">Preparado para telemetria e fila; sem autoridade de escrita. #17 continua sendo o audit gate.</p>
+            <div class="mini-pipe" id="submarinePipe">
+              <span>ticket</span><span>envelope</span><span>executor</span><span>testes</span><span>red team</span><span>evidence</span><span>Draft PR</span><span>Human Review</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="privacy-note" id="controlPrivacy">
+          🔒 <b>Trust boundary:</b> este site é público. Tickets privados, conteúdo do Stein-Brain e documentos do Drive só podem aparecer após autenticação server-side; sem credencial, o painel falha fechado.
+        </div>
+      </div>
+    </div>
+
     <!-- GITHUB -->
     <div class="row anchor-section" id="github-section">
       <div class="card">
@@ -660,8 +1003,8 @@
         <div class="system-grid">
           <div class="system-item"><span class="status-pill ok">● GITHUB</span><b>Verdade versionada</b><span>Governança, código, decisões, contratos, missões, sessões e PRs.</span></div>
           <div class="system-item"><span class="status-pill info">● DRIVE</span><b>Custódia / intercâmbio</b><span>Evidência externa ou pesada entra para reconciliação; não vira autoridade do repo automaticamente.</span></div>
-          <div class="system-item"><span class="status-pill warn">● BRAIN</span><b>Integração dinâmica: próxima camada</b><span>Este index v0 é estático. Sincronização automática com Stein-Brain exige API/adapter próprio e deve entrar por missão.</span></div>
-          <div class="system-item"><span class="status-pill info">● V0</span><b>Sem backend obrigatório</b><span>Menu, roleta e snapshot funcionam localmente no navegador. Backend só entra quando precisarmos de estado vivo/escrita.</span></div>
+          <div class="system-item"><span class="status-pill warn">● BRAIN</span><b>Adapter privado V1</b><span>A Control API privada pode ler o estado do Stein-Brain quando as credenciais server-side forem configuradas; conteúdo continua fail-closed.</span></div>
+          <div class="system-item"><span class="status-pill info">● V1</span><b>Fallback local preservado</b><span>O painel funciona sem backend; a API acrescenta estado vivo read-only e nunca transforma indisponibilidade em permissão.</span></div>
         </div>
       </div>
     </div>
@@ -1085,6 +1428,164 @@ try{
   const saved=localStorage.getItem('factoryCommandCenter.section');
   if(saved && document.getElementById(saved)) setTimeout(()=>activateNav(saved,false),0);
 }catch(e){}
+
+
+/* ---------- LIVE CONTROL PLANE ---------- */
+const CONTROL_POLL_MS = 60000;
+
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g,ch=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[ch]);
+}
+
+function sourceClass(status){
+  const s=String(status||"").toUpperCase();
+  if(s==="LIVE") return "src-live";
+  if(["PRIVATE_LOCKED","LOCKED"].includes(s)) return "src-lock";
+  if(["OFF","UNCONFIGURED"].includes(s)) return "src-off";
+  if(["DEGRADED","ERROR"].includes(s)) return "src-bad";
+  return "src-next";
+}
+
+function sourceCard(name,status,detail){
+  return `<div class="source-card"><span class="source-state ${sourceClass(status)}">${escapeHtml(status||"UNKNOWN")}</span><b>${escapeHtml(name)}</b><span>${escapeHtml(detail||"")}</span></div>`;
+}
+
+function renderControl(data, privateMode=false){
+  const sources=data?.sources||{};
+  const github=sources.github||{};
+  const brain=sources.brain||{};
+  const drive=sources.drive||{};
+  const auditor=data?.auditor||sources.auditor||{};
+  const submarine=data?.submarine||{mode:"OFF",pipeline:[]};
+
+  let githubDetail="telemetria indisponível";
+  if(privateMode && Array.isArray(github.repositories)){
+    githubDetail=`${github.repositories.length} repositório(s) privado(s) indexado(s)`;
+  }else if(github.repo){
+    githubDetail=`${github.openIssues ?? "?"} issues · ${github.openPullRequests ?? "?"} PRs · ${String(github.mainSha||"").slice(0,8)||"sem SHA"}`;
+  }
+
+  let brainDetail=brain.repo
+    ? `${brain.repo} · ${brain.openIssues ?? "?"} issues · ${brain.openPullRequests ?? "?"} PRs`
+    : (brain.mode||brain.reason||"adapter privado");
+  let driveDetail=Array.isArray(drive.files)
+    ? `${drive.files.length} item(ns) no índice privado`
+    : (drive.reason||drive.mode||"OAuth privado não configurado");
+  const auditorStatus=auditor.claudeCode?.status||auditor.status||"PLANNED";
+  const auditorDetail=auditor.claudeCode?.role||auditor.name||"red team independente";
+
+  const cards=[
+    sourceCard("GitHub",github.status||"UNKNOWN",githubDetail),
+    sourceCard("Brain",brain.status||"PRIVATE_LOCKED",brainDetail),
+    sourceCard("Drive",drive.status||"PRIVATE_LOCKED",driveDetail),
+    sourceCard("Submarino",submarine.mode||"OFF",submarine.writeAuthority?"write authority enabled":"sem autoridade de escrita"),
+    sourceCard("Auditor adversarial",auditorStatus,auditorDetail)
+  ];
+  const sourceEl=document.getElementById("controlSources");
+  if(sourceEl) sourceEl.innerHTML=cards.join("");
+
+  const focus=data?.focus||{};
+  if(focus.northStar && document.getElementById("focusNorth")){
+    document.getElementById("focusNorth").textContent=focus.northStar;
+  }
+
+  const queue=Array.isArray(focus.queue) && focus.queue.length
+    ? focus.queue
+    : (Array.isArray(focus.lanes)?focus.lanes:[]);
+
+  const queueEl=document.getElementById("focusQueue");
+  if(queueEl && queue.length){
+    queueEl.innerHTML=queue.map((item,index)=>{
+      const order=item.order||index+1;
+      const label=item.title||item.name||`Issue #${item.number||"?"}`;
+      const meta=item.number ? `Issue #${item.number}` : (privateMode?"privado":"detalhes privados bloqueados");
+      const state=item.state||"QUEUED";
+      return `<div class="focus-item"><span class="focus-order">${escapeHtml(order)}</span><div><b>${escapeHtml(label)}</b><small>${escapeHtml(meta)}</small></div><span class="focus-status">${escapeHtml(state)}</span></div>`;
+    }).join("");
+  }
+
+  const mode=String(submarine.mode||"OFF").toUpperCase();
+  const subEl=document.getElementById("submarineState");
+  if(subEl){
+    subEl.textContent=mode;
+    subEl.classList.toggle("off",mode==="OFF");
+    subEl.classList.toggle("on",mode!=="OFF");
+  }
+  const top=document.getElementById("submarineTopState");
+  if(top) top.textContent=`● ${mode} · ${submarine.writeAuthority?"write habilitado":"sem write"}`;
+
+  const pipe=Array.isArray(submarine.pipeline)?submarine.pipeline:[];
+  const pipeEl=document.getElementById("submarinePipe");
+  if(pipeEl && pipe.length) pipeEl.innerHTML=pipe.map(x=>`<span>${escapeHtml(x)}</span>`).join("");
+
+  const note=document.getElementById("submarineNote");
+  if(note) note.textContent=submarine.note||(`WIP=${submarine.wipLimit||1}. Merge, deploy, produção, DB e secrets continuam Human Gate.`);
+
+  const updated=document.getElementById("controlUpdated");
+  if(updated){
+    const when=data?.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-BR") : "sem timestamp";
+    updated.textContent=`${privateMode?"PRIVADO":"PÚBLICO"} · atualizado ${when}`;
+  }
+
+  document.body.dataset.controlMode=privateMode?"private":"public";
+  const unlock=document.getElementById("privateUnlock");
+  const lock=document.getElementById("privateLock");
+  if(unlock) unlock.style.display=privateMode?"none":"";
+  if(lock) lock.style.display=privateMode?"":"none";
+}
+
+async function fetchControl(privateMode=false){
+  const options={headers:{Accept:"application/json"}};
+  let endpoint="/api/control-state";
+  if(privateMode){
+    const token=sessionStorage.getItem("factory.control.token");
+    if(!token) throw new Error("private_token_missing");
+    endpoint="/api/private-state";
+    options.headers.Authorization=`Bearer ${token}`;
+  }
+  const response=await fetch(endpoint,options);
+  if(!response.ok){
+    const error=new Error(`control_api_${response.status}`);
+    error.status=response.status;
+    throw error;
+  }
+  return response.json();
+}
+
+async function refreshControl(){
+  const hasPrivate=Boolean(sessionStorage.getItem("factory.control.token"));
+  try{
+    const data=await fetchControl(hasPrivate);
+    renderControl(data,hasPrivate);
+  }catch(error){
+    if(hasPrivate && [401,503].includes(error.status)){
+      sessionStorage.removeItem("factory.control.token");
+      try{
+        const data=await fetchControl(false);
+        renderControl(data,false);
+      }catch(publicError){}
+    }
+    const updated=document.getElementById("controlUpdated");
+    if(updated) updated.textContent=`API indisponível · fallback local · ${new Date().toLocaleTimeString("pt-BR")}`;
+  }
+}
+
+document.getElementById("controlRefresh")?.addEventListener("click",refreshControl);
+document.getElementById("privateUnlock")?.addEventListener("click",async()=>{
+  const token=window.prompt("Token privado do Command Center (fica somente nesta aba):");
+  if(!token) return;
+  sessionStorage.setItem("factory.control.token",token);
+  await refreshControl();
+});
+document.getElementById("privateLock")?.addEventListener("click",()=>{
+  sessionStorage.removeItem("factory.control.token");
+  refreshControl();
+});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden) refreshControl();});
+setInterval(refreshControl,CONTROL_POLL_MS);
+refreshControl();
 
 render('today');
 </script>

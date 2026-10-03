@@ -1,0 +1,39 @@
+{
+  "schema": "stein.submarine-control.v1",
+  "mode": "OFF",
+  "writeAuthority": false,
+  "wipLimit": 1,
+  "auditGate": {
+    "repository": "denistein2/AgentFactory",
+    "issue": 17,
+    "requiredState": "PASS"
+  },
+  "pipeline": [
+    "ticket",
+    "mission-envelope",
+    "executor",
+    "tests",
+    "adversarial-audit",
+    "evidence",
+    "draft-pr",
+    "human-review"
+  ],
+  "humanGates": [
+    "merge",
+    "deploy",
+    "production",
+    "live-database",
+    "secrets",
+    "scope-expansion"
+  ],
+  "auditors": {
+    "ca": "HUMAN_REVIEW",
+    "claudeCode": "PLANNED_NOT_CONNECTED"
+  },
+  "invariants": [
+    "No write mission starts while mode=OFF.",
+    "No public surface may expose private Brain or Drive content.",
+    "No autonomous merge, deploy, production mutation or secret mutation.",
+    "Evidence must be bound to the exact tested SHA before review readiness."
+  ]
+}
